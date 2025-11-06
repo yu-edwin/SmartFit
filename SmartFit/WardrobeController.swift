@@ -12,6 +12,8 @@ class WardrobeController: ObservableObject {
     }
     @Published var showAddSheet = false
     @Published var outfits: [Int: [String: String]] = [1: [:], 2: [:], 3: [:]]
+    @Published var isLoading = false
+    private var hasLoadedItems = false
 
     var currentEquippedOutfit: [String: String] {
         outfits[selectedOutfit] ?? [:]
@@ -45,16 +47,25 @@ class WardrobeController: ObservableObject {
     }
 
     func loadItems() {
+        guard !hasLoadedItems else { return }
+        hasLoadedItems = true
+
         Task {
+            await MainActor.run {
+                self.isLoading = true
+            }
             do {
                 try await model.fetchItems()
                 if !loadOutfits() {
-                    DispatchQueue.main.async {
+                    await MainActor.run {
                         self.outfits = [1: [:], 2: [:], 3: [:]]
                     }
                 }
             } catch {
                 print("Error loading items: \(error)")
+            }
+            await MainActor.run {
+                self.isLoading = false
             }
         }
     }

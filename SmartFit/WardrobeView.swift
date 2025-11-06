@@ -6,24 +6,35 @@ struct WardrobeView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(controller.categories, id: \.self) { category in
-                            Button(category.capitalized) {
-                                controller.selectedCategory = category
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(controller.selectedCategory == category ? Color.blue : Color.gray.opacity(0.2))
-                            .foregroundColor(controller.selectedCategory == category ? .white : .black)
-                            .cornerRadius(20)
-                        }
-                    }
-                    .padding()
+            if controller.isLoading {
+                VStack(spacing: 20) {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                    Text("Loading your wardrobe...")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(controller.categories, id: \.self) { category in
+                                Button(category.capitalized) {
+                                    controller.selectedCategory = category
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(controller.selectedCategory == category ? Color.blue : Color.gray.opacity(0.2))
+                                .foregroundColor(controller.selectedCategory == category ? .white : .black)
+                                .cornerRadius(20)
+                            }
+                        }
+                        .padding()
+                    }
 
-                if controller.filteredItems.isEmpty {
+                    if controller.filteredItems.isEmpty {
                     VStack {
                         Image(systemName: "hanger")
                             .font(.system(size: 60))
@@ -88,9 +99,10 @@ struct WardrobeView: View {
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
             }
-            .task {
-                controller.loadItems()
             }
+        }
+        .task {
+            controller.loadItems()
         }
     }
 }
