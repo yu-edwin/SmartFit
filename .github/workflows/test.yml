@@ -1,0 +1,52 @@
+name: Run Tests and Lint
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  # 🧪 Node backend tests
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: backend
+
+      - name: Check Prettier formatting
+        run: npx prettier --check .
+        working-directory: backend
+
+      - name: Run tests
+        run: npm test
+        working-directory: backend
+
+  ios-lint:
+    name: SwiftLint Check
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Run SwiftLint
+        run: swiftlint lint --quiet
+        working-directory: SmartFit

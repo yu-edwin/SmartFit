@@ -1,6 +1,6 @@
 # SmartFit
 
-##  MVP - Sprint 1
+##  MVP
 
 ###  Description
 
@@ -14,6 +14,30 @@ This means that their algorithm is only able to detect clothes if you submit a p
 - An image where the tops (shirt/jacket/etc) is directly above the bottoms (pants/shorts/etc) 
 
 Doppl lacks a wardrobe feature since they only have suggested outfits that are pre-registered and only WHOLE outfit uploads, so mixing and matching different tops/bottoms are difficult. 
+
+### Testing Framework & Execution
+- Jest for backend (configuration file present)
+
+### Code Quality Tools
+
+**Commands to check code quality**
+
+**Backend**
+- npm run lint      (esLint)
+- npm run format    (prettier)
+
+**FrontEnd**
+- brew install swiftlint (Install brew first if not already)
+- swiftlint lint --quiet
+
+### Branching Organization
+
+- Each member created their own 'working branch' that reflected on the ticket they are completing in the backlog
+- Development branch was implemented and all members pushed (PR) into this branch from their working branch
+- Development branch was pushed into main branch after Sprint 2.
+
+### Sprint 2 Burn Chart:
+[Burn Chart Link] (https://github.com/users/yu-edwin/projects/1/insights/2?period=2W)
 
 ### Access Instructions
 

@@ -31,17 +31,15 @@ class CameraViewController: UIViewController {
         }
         captureSession.startRunning()
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let safeBounds = view.bounds.inset(by: view.safeAreaInsets)
         previewLayer?.frame = safeBounds
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         captureSession.stopRunning()
     }
 }
-
-

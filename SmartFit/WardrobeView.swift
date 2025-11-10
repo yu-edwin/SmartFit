@@ -6,48 +6,63 @@ struct WardrobeView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(controller.categories, id: \.self) { category in
-                            Button(category.capitalized) {
-                                controller.selectedCategory = category
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(controller.selectedCategory == category ? Color.blue : Color.gray.opacity(0.2))
-                            .foregroundColor(controller.selectedCategory == category ? .white : .black)
-                            .cornerRadius(20)
-                        }
-                    }
-                    .padding()
-                }
-
-                if controller.filteredItems.isEmpty {
-                    VStack {
-                        Image(systemName: "hanger")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
-                        Text("No items yet")
+            ZStack {
+                if controller.isLoading {
+                    // Loading screen
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        Text("Loading your wardrobe...")
                             .font(.headline)
-                            .padding()
-                        Button("Add Item") {
-                            controller.showAddSheet = true
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                            .foregroundColor(.gray)
                     }
-                    .frame(maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            ForEach(controller.filteredItems) { item in
-                                ItemCard(item: item, controller: controller)
+                    VStack {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(controller.categories, id: \.self) { category in
+                                    Button(category.capitalized) {
+                                        controller.selectedCategory = category
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(controller.selectedCategory == category ? Color.blue : Color.gray.opacity(0.2))
+                                    .foregroundColor(controller.selectedCategory == category ? .white : .black)
+                                    .cornerRadius(20)
+                                }
+                            }
+                            .padding()
+                        }
+
+                        if controller.filteredItems.isEmpty {
+                            VStack {
+                                Image(systemName: "hanger")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.gray)
+                                Text("No items yet")
+                                    .font(.headline)
+                                    .padding()
+                                Button("Add Item") {
+                                    controller.showAddSheet = true
+                                }
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                            }
+                            .frame(maxHeight: .infinity)
+                        } else {
+                            ScrollView {
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                    ForEach(controller.filteredItems) { item in
+                                        ItemCard(item: item, controller: controller)
+                                    }
+                                }
+                                .padding()
                             }
                         }
-                        .padding()
                     }
                 }
             }
@@ -104,7 +119,7 @@ struct ItemCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             ZStack(alignment: .bottomTrailing) {
                 if let imageData = item.image_data,
                    let base64 = imageData.components(separatedBy: ",").last,
@@ -112,14 +127,15 @@ struct ItemCard: View {
                    let uiImage = UIImage(data: data) {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 150)
+                        .aspectRatio(1, contentMode: .fill)
+                        .frame(maxWidth: .infinity, minHeight: 160, maxHeight: 160)
                         .clipped()
-                        .cornerRadius(8)
+                        .cornerRadius(10)
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(height: 150)
+                        .frame(height: 160)
+                        .aspectRatio(1, contentMode: .fill)
                         .cornerRadius(8)
                         .overlay(
                             Image(systemName: "tshirt")
@@ -140,21 +156,80 @@ struct ItemCard: View {
                         .padding(8)
                 }
             }
+            ZStack(alignment: .bottomTrailing) {
+                VStack(alignment: .center) {
+                    HStack {
+                        Text(item.name)
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                            .lineLimit(1)
+                    }
 
-            Text(item.name)
-                .font(.headline)
-                .lineLimit(1)
+                    HStack {
+                        if let brand = item.brand, !brand.isEmpty {
+                            Text("\(brand.uppercased()) •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Brand: --- •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                        if let size = item.size, !size.isEmpty {
+                            Text("Size: \(size.uppercased())")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Size: --")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                    }
 
-            if let brand = item.brand {
-                Text(brand)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    HStack {
+                        if let color = item.color, !color.isEmpty {
+                            Text("\(color.capitalized) •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Color: -- •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                        if let material = item.material, !material.isEmpty {
+                            Text("\(material.capitalized)")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Material: --")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                    }
+
+                    HStack {
+                        Spacer()
+                        if let price = item.price, price > 0 {
+                            Text("$\(String(format: "%.2f", price))")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.blue)
+                        } else {
+                            Text("Price: ---")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
             }
         }
         .padding(8)
-        .background(Color.black)
-        .cornerRadius(12)
-        .shadow(radius: 2)
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
+        // .border(Color.gray)
+        // .cornerRadius(5)
+        // .shadow(radius: 2)
         .onTapGesture {
             controller.equipItem(itemId: item.id, category: item.category)
         }
@@ -168,26 +243,59 @@ struct AddItemSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Photo") {
+                Section(header: Text("Photo *")) {
                     if let imageData = controller.formImageData, let uiImage = UIImage(data: imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFit()
                             .frame(maxHeight: 200)
+                            .cornerRadius(8)
                     }
                     PhotosPicker(selection: $controller.formSelectedImage, matching: .images) {
                         Label("Select Photo", systemImage: "photo")
                     }
                 }
 
-                Section("Details") {
-                    TextField("Name", text: $controller.formName)
-                    Picker("Category", selection: $controller.formCategory) {
+                Section(header: Text("Basic Information")) {
+                    TextField("Name *", text: $controller.formName)
+                        .autocapitalization(.words)
+
+                    Picker("Category *", selection: $controller.formCategory) {
                         ForEach(controller.formCategories, id: \.self) { cat in
                             Text(cat.capitalized)
                         }
                     }
+
                     TextField("Brand (optional)", text: $controller.formBrand)
+                        .autocapitalization(.words)
+                    TextField("Color *", text: $controller.formColor)
+                        .autocapitalization(.words)
+                }
+
+                Section(header: Text("Size")) {
+                    Picker("Size *", selection: $controller.formSize) {
+                        ForEach(controller.sizeOptions, id: \.self) { size in
+                            Text(size).tag(size)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section(header: Text("Price (Optional)")) {
+                    HStack {
+                        Text("$")
+                            .foregroundColor(.secondary)
+                        TextField("0.00", text: $controller.formPrice)
+                            .keyboardType(.decimalPad)
+                    }
+                }
+
+                Section(header: Text("Additional Information (Optional)")) {
+                    TextField("Product URL", text: $controller.formItemUrl)
+                        .autocapitalization(.none)
+                        .keyboardType(.URL)
+                    TextField("Material", text: $controller.formMaterial)
+                        .autocapitalization(.words)
                 }
 
                 if let errorMessage = controller.formErrorMessage {
@@ -196,6 +304,12 @@ struct AddItemSheet: View {
                             .foregroundColor(.red)
                             .font(.caption)
                     }
+                }
+
+                Section {
+                    Text("* Required fields")
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
             }
             .navigationTitle("Add Item")
@@ -211,7 +325,9 @@ struct AddItemSheet: View {
                     Button("Add") {
                         controller.submitAddItem()
                     }
-                    .disabled(controller.formName.isEmpty || controller.formIsLoading)
+                    .disabled(controller.formName.isEmpty ||
+                             controller.formColor.isEmpty ||
+                             controller.formIsLoading)
                 }
             }
             .onChange(of: controller.formSelectedImage) { _, newValue in
