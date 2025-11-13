@@ -42,7 +42,7 @@ Doppl lacks a wardrobe feature since they only have suggested outfits that are p
 ### Access Instructions
 
 - Simply click the link below!
-**Deployed URL:** [SmartFit application!](https://appetize.io/app/b_p3ygky3jpsbdttgm25pzi5du6e)
+**Deployed URL:** [SmartFit application!](https://appetize.io/app/b_uts5azk3scpg26xwhibbvcawne)
 
 ### Github Project
 **URL:** [Project](https://github.com/users/yu-edwin/projects/1)
