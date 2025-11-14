@@ -53,11 +53,9 @@
 5. Unit Testing for all CRUD requests (3)
 6. All CRUD Requests for backend (5)
 
-- Edwin (13)
+- Edwin (8)
 1. User Login Feature (5)
 2. Loading Screen (3) 
-3. Clothing item info card (5)
-4. Set up github actions (?)
 
 - Daiki (5)
 1. Fixed add item form (3)
@@ -67,7 +65,7 @@
 
 **Realistic Commitment**
 - **Sprint 1 Velocity:** 26 points  
-- **Sprint 2 Target Velocity:** 36 Points
+- **Sprint 2 Target Velocity:** 37 Points
 - 50% sprint increase (May be due to increased number of tickets) 
 - Workload balanced between backend, frontend, and testing efforts.
 
