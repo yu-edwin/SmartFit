@@ -67,7 +67,7 @@
 
 **Realistic Commitment**
 - **Sprint 1 Velocity:** 26 points  
-- **Sprint 2 Target Velocity:** 39 Points
+- **Sprint 2 Target Velocity:** 36 Points
 - 50% sprint increase (May be due to increased number of tickets) 
 - Workload balanced between backend, frontend, and testing efforts.
 
