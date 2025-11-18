@@ -13,30 +13,11 @@ class CameraViewController: UIViewController {
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private var currentCameraPosition: AVCaptureDevice.Position = .back
     private var currentInput: AVCaptureDeviceInput?
-    var onDismiss: (() -> Void)?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
-        setupCloseButton()
         setupRotateButton()
-    }
-    
-    private func setupCloseButton() {
-        let closeButton = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
-        
-        closeButton.setImage(UIImage(systemName: "xmark", withConfiguration: config), for: .normal)
-        closeButton.tintColor = .white
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
-        
-        view.addSubview(closeButton)
-        
-        NSLayoutConstraint.activate([
-            closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
-            closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
-        ])
     }
     
     private func setupRotateButton() {
@@ -56,11 +37,6 @@ class CameraViewController: UIViewController {
         ])
     }
 
-    
-    @objc private func closeTapped() {
-        onDismiss?()
-    }
-    
     @objc private func rotateCameraTapped() {
         currentCameraPosition = currentCameraPosition == .back ? .front : .back
         switchCamera()
