@@ -73,22 +73,27 @@ class CameraViewController: UIViewController {
                                                    position: currentCameraPosition),
               let input = try? AVCaptureDeviceInput(device: device),
               captureSession.canAddInput(input) else { return }
-        
+
         captureSession.addInput(input)
         currentInput = input
-        
+
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer?.videoGravity = .resizeAspectFill
         previewLayer?.frame = view.bounds
         if let previewLayer = previewLayer {
             view.layer.addSublayer(previewLayer)
         }
-        captureSession.startRunning()
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            self?.captureSession.startRunning()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        captureSession.stopRunning()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            self?.captureSession.stopRunning()
+        }
     }
     
     override func viewDidLayoutSubviews() {
