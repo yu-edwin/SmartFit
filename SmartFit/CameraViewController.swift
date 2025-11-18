@@ -17,40 +17,17 @@ class CameraViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
-        setupRotateButton()
-    }
-    
-    private func setupRotateButton() {
-        let rotateButton = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
-        
-        rotateButton.setImage(UIImage(systemName: "camera.rotate", withConfiguration: config), for: .normal)
-        rotateButton.tintColor = .white
-        rotateButton.translatesAutoresizingMaskIntoConstraints = false
-        rotateButton.addTarget(self, action: #selector(rotateCameraTapped), for: .touchUpInside)
-        
-        view.addSubview(rotateButton)
-        
-        NSLayoutConstraint.activate([
-            rotateButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
-            rotateButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
-        ])
     }
 
-    @objc private func rotateCameraTapped() {
+    func rotateCamera() {
         currentCameraPosition = currentCameraPosition == .back ? .front : .back
-        switchCamera()
-    }
-    
-    private func switchCamera() {
+
         captureSession.beginConfiguration()
-        
-        // Remove current input
+
         if let currentInput = currentInput {
             captureSession.removeInput(currentInput)
         }
-        
-        // Get camera for new position
+
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                    for: .video,
                                                    position: currentCameraPosition),
@@ -59,11 +36,10 @@ class CameraViewController: UIViewController {
             captureSession.commitConfiguration()
             return
         }
-        
-        // Add new input
+
         captureSession.addInput(newInput)
         currentInput = newInput
-        
+
         captureSession.commitConfiguration()
     }
     
