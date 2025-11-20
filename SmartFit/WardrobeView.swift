@@ -107,19 +107,6 @@ struct WardrobeView: View {
                 }
             }
             .navigationTitle("Wardrobe")
-            .overlay(alignment: .bottomTrailing) {
-                Button {
-                    controller.showAddSheet = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 56, height: 56)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
-                .padding(20)
-            }
             // Displays Add item to wardrobe sheet (POST Request)
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
