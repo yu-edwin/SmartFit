@@ -19,8 +19,9 @@ struct WardrobeView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    VStack(spacing: 0) {
-                        ScrollView(.horizontal, showsIndicators: false) {
+                    ZStack(alignment: .bottomTrailing) {
+                        VStack(spacing: 0) {
+                            ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(controller.categories, id: \.self) { category in
                                     Button(category.capitalized) {
@@ -71,38 +72,35 @@ struct WardrobeView: View {
                             }
                         }
 
-                        Spacer(minLength: 0)
-
-                        // Add button above picker
-                        HStack {
-                            Spacer()
-                            Button {
-                                controller.showAddSheet = true
-                            } label: {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 56, height: 56)
-                                    .background(Color.blue)
-                                    .clipShape(Circle())
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 8)
-
-                        // Outfit selector bar at bottom
-                        VStack(spacing: 0) {
-                            Divider()
-                            Picker("Select Outfit", selection: $controller.selectedOutfit) {
-                                ForEach(1...3, id: \.self) { outfitNumber in
-                                    Text("Outfit \(outfitNumber)").tag(outfitNumber)
+                            // Outfit selector bar at bottom
+                            VStack(spacing: 0) {
+                                Divider()
+                                Picker("Select Outfit", selection: $controller.selectedOutfit) {
+                                    ForEach(1...3, id: \.self) { outfitNumber in
+                                        Text("Outfit \(outfitNumber)").tag(outfitNumber)
+                                    }
                                 }
+                                .pickerStyle(.segmented)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color(UIColor.systemBackground))
                             }
-                            .pickerStyle(.segmented)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(Color(UIColor.systemBackground))
                         }
+
+                        // Floating add button
+                        Button {
+                            controller.showAddSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 60)
                     }
                 }
             }
