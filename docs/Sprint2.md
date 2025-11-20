@@ -180,7 +180,7 @@
 - Automated deployment configured through **appitize**
 - Must manually redeploy 
 - Link changes after every update
-- **Live URL:** [SmartFit Application]()
+- **Live URL:** [SmartFit Application](https://appetize.io/app/b_uts5azk3scpg26xwhibbvcawne)
 
 **CI/CD Pain Points**
 1. Initial pipeline failed due to missing environment variables.  

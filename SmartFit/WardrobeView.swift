@@ -28,8 +28,14 @@ struct WardrobeView: View {
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(controller.selectedCategory == category ? Color.blue : Color.gray.opacity(0.2))
-                                    .foregroundColor(controller.selectedCategory == category ? .white : .black)
+                                    .background(controller.selectedCategory == category
+                                        ? Color.blue
+                                        : Color.gray.opacity(0.2)
+                                    )
+                                    .foregroundColor(controller.selectedCategory == category
+                                        ? .white
+                                        : .black
+                                    )
                                     .cornerRadius(20)
                                 }
                             }
@@ -101,8 +107,32 @@ struct WardrobeView: View {
                 }
             }
             .navigationTitle("Wardrobe")
+            .overlay(alignment: .bottomTrailing) {
+                Button {
+                    controller.showAddSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 56, height: 56)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                }
+                .padding(20)
+            }
+            // Displays Add item to wardrobe sheet (POST Request)
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
+            }
+            // Displays Update existing clothing item sheet (PUT Request)
+            .sheet(isPresented: $controller.showEditSheet) {
+                UpdateItemSheet(controller: controller)
+            }
+            // Displays wardrobeItem info card
+            .sheet(isPresented: $controller.showInfoSheet) {
+                if let item = controller.infoItem {
+                    ItemInfoSheet(item: item)
+                }
             }
             .task {
                 controller.loadItems()
@@ -157,6 +187,38 @@ struct ItemCard: View {
                         .padding(8)
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                VStack(spacing: 8) {
+                    // Info button (top)
+                    Button {
+                        controller.showInfo(for: item)
+                        print("Info tapped for \(item.name)")
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 14, weight: .bold))
+                            .padding(6)
+                            .background(Color.white.opacity(0.9))
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
+                    }
+                    .buttonStyle(.plain)
+
+                    // Edit button (below)
+                    Button {
+                        controller.startEditing(item)
+                    } label: {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 14, weight: .bold))
+                            .padding(6)
+                            .background(Color.white.opacity(0.9))
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(8)
+            }
+
             ZStack(alignment: .bottomTrailing) {
                 VStack(alignment: .center) {
                     HStack {

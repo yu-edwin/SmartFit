@@ -23,11 +23,15 @@ struct WardrobeItem: Identifiable, Codable {
     }
 }
 
+struct UpdateWardrobeResponse: Codable {
+    let message: String
+    let data: WardrobeItem
+}
+
 class WardrobeModel: ObservableObject {
     @Published var items: [WardrobeItem] = []
 
-
-    private let baseURL = "https://smartfit-development.onrender.com/api/wardrobe"
+    private let baseURL = "https://smartfit-backend-lhz4.onrender.com/api/wardrobe"
     private let urlSession: URLSession
 
     init(urlSession: URLSession = .shared) {
@@ -74,7 +78,7 @@ class WardrobeModel: ObservableObject {
         size: String,
         price: String,
         material: String,
-        itemUrl: String,
+        itemUrl: String?,
         imageData: Data?
     ) async throws {
         guard let userId = getCurrentUserId() else {
@@ -106,7 +110,7 @@ class WardrobeModel: ObservableObject {
             body["material"] = material
         }
 
-        if !itemUrl.isEmpty {
+        if let itemUrl = itemUrl {
             body["item_url"] = itemUrl
         }
 
@@ -118,7 +122,7 @@ class WardrobeModel: ObservableObject {
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         let (_, response) = try await urlSession.data(for: request)
-        
+
         if let httpResponse = response as? HTTPURLResponse {
             print("Response status code: \(httpResponse.statusCode)")
             if httpResponse.statusCode != 201 && httpResponse.statusCode != 200 {
@@ -130,5 +134,90 @@ class WardrobeModel: ObservableObject {
         }
 
         try await fetchItems()
+    }
+
+    // Main call for PUT request wardrobeItem (clothingItem)
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    func updateItem(
+        itemId: String,
+        name: String? = nil,
+        category: String? = nil,
+        brand: String? = nil,
+        color: String? = nil,
+        size: String? = nil,
+        price: Double? = nil,
+        material: String? = nil,
+        itemUrl: String? = nil,
+        imageData: Data? = nil
+    ) async throws {
+        // 1. Build URL: /api/wardrobe/:id
+        guard let url = URL(string: "\(baseURL)/\(itemId)") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        // 2. Build body with only non-nil values (partial update)
+        var body: [String: Any] = [:]
+
+        if let name = name {
+            body["name"] = name
+        }
+        if let category = category {
+            body["category"] = category
+        }
+        if let brand = brand {
+            body["brand"] = brand
+        }
+        if let color = color {
+            body["color"] = color
+        }
+        if let size = size {
+            body["size"] = size.uppercased()
+        }
+        if let price = price {
+            body["price"] = price
+        }
+        if let material = material {
+            body["material"] = material
+        }
+        if let itemUrl = itemUrl {
+            body["item_url"] = itemUrl
+        }
+        if let imageData = imageData {
+            let base64 = "data:image/jpeg;base64," + imageData.base64EncodedString()
+            body["image_data"] = base64
+        }
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        // 3. Send request
+        let (data, response) = try await urlSession.data(for: request)
+
+        // 4. Check status code
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to update item"]
+            )
+        }
+
+        // 5. Decode response: { message, data: { ...updated WardrobeItem... } }
+        let decoder = JSONDecoder()
+        let updatedResponse = try decoder.decode(UpdateWardrobeResponse.self, from: data)
+        let updatedItem = updatedResponse.data
+
+        // 6. Update local items array so UI refreshes
+        await MainActor.run {
+            if let index = self.items.firstIndex(where: { $0.id == updatedItem.id }) {
+                self.items[index] = updatedItem
+            }
+        }
     }
 }
