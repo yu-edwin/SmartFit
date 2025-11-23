@@ -20,8 +20,9 @@ struct WardrobeView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    VStack {
-                        ScrollView(.horizontal, showsIndicators: false) {
+                    ZStack(alignment: .bottomTrailing) {
+                        VStack(spacing: 0) {
+                            ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(controller.categories, id: \.self) { category in
                                     Button(category.capitalized) {
@@ -73,36 +74,38 @@ struct WardrobeView: View {
                                     }
                                 }
                                 .padding()
+                                .padding(.bottom, 70)
                             }
                         }
-                    }
-                }
-            }
-            .navigationTitle("Wardrobe")
-            .toolbar {
-                // Right: outfit selector (1–3)
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 8) {
-                        ForEach(1...3, id: \.self) { outfitNumber in
-                            ZStack {
-                                controller.selectedOutfit == outfitNumber
-                                    ? Color.blue
-                                    : Color.gray.opacity(0.2)
+                            // Outfit selector bar at bottom
+                            VStack(spacing: 0) {
+                                Divider()
+                                Picker("Select Outfit", selection: $controller.selectedOutfit) {
+                                    ForEach(1...3, id: \.self) { outfitNumber in
+                                        Text("Outfit \(outfitNumber)").tag(outfitNumber)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color(UIColor.systemBackground))
+                            }
+                        }
 
-                                Text(String(outfitNumber))
-                                    .foregroundColor(
-                                        controller.selectedOutfit == outfitNumber
-                                            ? .white
-                                            : .black
-                                    )
-                                    .font(.system(size: 14, weight: .semibold))
-                            }
-                            .frame(width: 40, height: 40)
-                            .cornerRadius(6)
-                            .onTapGesture {
-                                controller.selectedOutfit = outfitNumber
-                            }
+                        // Floating add button
+                        Button {
+                            controller.showAddSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
                         }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 60)
                     }
                 }
             }
@@ -202,6 +205,7 @@ struct WardrobeView: View {
             .sheet(isPresented: $controller.showUrlImportSheet) {
                 UrlImportSheet(controller: controller)
             }
+            .navigationTitle("Wardrobe")
             // Displays Add item to wardrobe sheet (POST Request)
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
@@ -382,7 +386,7 @@ struct ItemCard: View {
 }
 
 struct AddItemSheet: View {
-    @Environment(\.dismiss) var dismiss
+    @SwiftUI.Environment(\.dismiss) var dismiss
     @ObservedObject var controller: WardrobeController
 
     var body: some View {
