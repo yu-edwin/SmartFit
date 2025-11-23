@@ -28,6 +28,7 @@ struct PhotoFormView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityIdentifier("capturedPhoto")
 
                 Spacer()
 
@@ -44,6 +45,7 @@ struct PhotoFormView: View {
                                 .foregroundColor(.gray)
                         }
                         .padding(.vertical, 8)
+                        .accessibilityIdentifier("loadingWardrobeIndicator")
                     } else if !equippedItems.isEmpty {
                         HStack(spacing: 12) {
                             ForEach(equippedItems) { item in
@@ -60,6 +62,7 @@ struct PhotoFormView: View {
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                         )
+                                        .accessibilityIdentifier("equippedItem_\(item.id)")
                                 } else {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(Color.gray.opacity(0.2))
@@ -68,15 +71,18 @@ struct PhotoFormView: View {
                                             Image(systemName: "tshirt")
                                                 .foregroundColor(.gray)
                                         )
+                                        .accessibilityIdentifier("equippedItem_\(item.id)")
                                 }
                             }
                         }
                         .padding(.horizontal)
+                        .accessibilityIdentifier("equippedItemsContainer")
                     } else {
                         Text("No items equipped")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .padding(.vertical, 8)
+                            .accessibilityIdentifier("noItemsEquippedLabel")
                     }
 
                     // Segmented picker for outfit selection
@@ -87,6 +93,7 @@ struct PhotoFormView: View {
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
+                    .accessibilityIdentifier("outfitPicker")
                 }
                 .padding(.vertical, 16)
                 .background(Color(UIColor.systemBackground))
@@ -97,6 +104,7 @@ struct PhotoFormView: View {
                     Button("Cancel") {
                         isPresented = false
                     }
+                    .accessibilityIdentifier("cancelButton")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Generate") {
@@ -104,6 +112,7 @@ struct PhotoFormView: View {
                         print("Generate button tapped with outfit \(selectedOutfit)")
                     }
                     .fontWeight(.semibold)
+                    .accessibilityIdentifier("generateButton")
                 }
             }
         }

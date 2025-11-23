@@ -42,6 +42,7 @@ struct CameraView: View {
                             .frame(width: 70, height: 70)
                     }
                     .padding(.trailing, 30)
+                    .accessibilityIdentifier("capturePhotoButton")
 
                     Spacer()
 
@@ -55,6 +56,7 @@ struct CameraView: View {
                             .padding()
                     }
                     .padding(.trailing, 30)
+                    .accessibilityIdentifier("rotateCameraButton")
                 }
                 .padding(.bottom, 30)
             }
