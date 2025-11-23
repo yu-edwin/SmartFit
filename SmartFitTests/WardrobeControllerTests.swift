@@ -54,4 +54,34 @@ struct WardrobeControllerTests {
         // Then: The item should be unequipped (nil)
         #expect(controller.outfits[1]?["tops"] == nil)
     }
+
+    @Test func equipItemThenToggleBackOn() async throws {
+        // Given: A controller with an item equipped and then unequipped
+        let controller = WardrobeController()
+        controller.selectedOutfit = 1
+        controller.equipItem(itemId: "item-123", category: "tops")
+        controller.equipItem(itemId: "item-123", category: "tops")  // Unequip
+
+        // Verify it's unequipped
+        #expect(controller.outfits[1]?["tops"] == nil)
+
+        // When: Tapping the same item again to re-equip
+        controller.equipItem(itemId: "item-123", category: "tops")
+
+        // Then: The item should be equipped again
+        #expect(controller.outfits[1]?["tops"] == "item-123")
+    }
+
+    @Test func equipDifferentItemDoesNotToggle() async throws {
+        // Given: A controller with an equipped item
+        let controller = WardrobeController()
+        controller.selectedOutfit = 1
+        controller.equipItem(itemId: "item-123", category: "tops")
+
+        // When: Equipping a different item in the same category
+        controller.equipItem(itemId: "item-456", category: "tops")
+
+        // Then: The new item should be equipped (not unequipped)
+        #expect(controller.outfits[1]?["tops"] == "item-456")
+    }
 }

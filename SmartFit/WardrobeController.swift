@@ -195,7 +195,16 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
     func equipItem(itemId: String, category: String) {
         print("Equipping item \(itemId) in category \(category) to outfit \(selectedOutfit)")
         var updatedOutfits = outfits
-        updatedOutfits[selectedOutfit]?[category] = itemId
+
+        // Toggle: if item is already equipped in this category, unequip it
+        if updatedOutfits[selectedOutfit]?[category] == itemId {
+            updatedOutfits[selectedOutfit]?[category] = nil
+            print("Unequipping item \(itemId) from outfit \(selectedOutfit)")
+        } else {
+            updatedOutfits[selectedOutfit]?[category] = itemId
+            print("Equipping item \(itemId) to outfit \(selectedOutfit)")
+        }
+
         outfits = updatedOutfits
         print("Updated outfit \(selectedOutfit): \(currentEquippedOutfit)")
         saveOutfits()
