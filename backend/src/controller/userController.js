@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import User from "../models/userSchema.js";
+import ClothingItem from "../models/clothingSchema.js";
 import { isValidEmail, isValidPassword } from "../utils/validation.js";
+import { generateOutfitImage } from "../services/geminiService.js";
 
 // GET request: Gets all info from user.
 export const getUserInfo = async (req, res) => {
@@ -229,5 +231,76 @@ export const updateOutfit = async (req, res) => {
     } catch (err) {
         console.error(`Failed to update outfit: ${err}`);
         res.status(500).json({ message: "Failed to update outfit" });
+    }
+};
+
+// POST request: Generates outfit image for a user's specified outfit
+export const generateOutfit = async (req, res) => {
+    try {
+        const { userId, outfitNumber } = req.params;
+        const { picture } = req.body;
+
+        // Validating request parameters
+        const errors = [];
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            errors.push("Invalid user ID");
+        }
+        if (!["1", "2", "3"].includes(outfitNumber)) {
+            errors.push("Outfit number must be 1, 2, or 3");
+        }
+        if (!picture || typeof picture !== "string") {
+            errors.push("Picture is required and must be a string");
+        } else if (!picture.startsWith("data:image/")) {
+            errors.push("Picture must be a valid base64 image data URL");
+        }
+        if (errors.length > 0) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: errors
+            });
+        }
+
+        // Find user and outfit
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const outfitField = `outfit${outfitNumber}`;
+        const outfit = user[outfitField];
+        if (!outfit || Object.keys(outfit).length === 0) {
+            return res.status(400).json({ message: "Outfit is empty" });
+        }
+
+        // Get all item IDs from outfit
+        const itemIds = Object.values(outfit);
+
+        // Fetch all wardrobe items
+        const wardrobeItems = await ClothingItem.find({
+            _id: { $in: itemIds }
+        });
+
+        // Build prompt with item descriptions
+        let prompt = "";
+        wardrobeItems.forEach((item) => {
+            if (item.description) {
+                prompt += item.description + " ";
+            }
+        });
+
+        // Generate outfit image using Gemini
+        console.log(`Generate outfit requested for user ${userId}, outfit ${outfitNumber}`);
+        const generatedImage = await generateOutfitImage(prompt, picture);
+
+        // Return generated outfit image
+        return res.status(200).json({
+            message: "Outfit generated successfully",
+            userId: userId,
+            outfitNumber: outfitNumber,
+            outfit: outfit,
+            generatedImage: generatedImage
+        });
+    } catch (err) {
+        console.error(`Failed to generate outfit: ${err}`);
+        res.status(500).json({ message: "Failed to generate outfit" });
     }
 };
