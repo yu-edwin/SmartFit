@@ -289,4 +289,215 @@ describe("User API", () => {
             expect(res.body.message).toContain("Email is not valid");
         });
     });
+
+    // Testing updateOutfit endpoint
+    describe("PATCH /api/user/:userId/:outfitNumber/:category/:itemId", () => {
+        const validUserId = "507f1f77bcf86cd799439011";
+        const validItemId = "507f1f77bcf86cd799439012";
+
+        test("returns 200 on successful outfit update", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const mockUser = {
+                _id: validUserId,
+                name: "Test User",
+                email: "test@example.com",
+                outfit1: {},
+                outfit2: {},
+                outfit3: {},
+                markModified: jest.fn(),
+                save: jest.fn().mockResolvedValue(true),
+            };
+
+            User.findById.mockResolvedValue(mockUser);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body).toHaveProperty("message", "Outfit updated successfully");
+            expect(res.body).toHaveProperty("outfit");
+            expect(mockUser.markModified).toHaveBeenCalledWith("outfit1");
+            expect(mockUser.save).toHaveBeenCalled();
+        });
+
+        test("returns 400 for invalid user ID", async () => {
+            mongoose.Types.ObjectId.isValid.mockImplementation((id) => id !== "invalidUserId");
+
+            const res = await request(app).patch(
+                `/api/user/invalidUserId/1/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty("message", "Validation failed");
+            expect(res.body.errors).toContain("Invalid user ID");
+        });
+
+        test("returns 400 for invalid outfit number", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/5/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty("message", "Validation failed");
+            expect(res.body.errors).toContain("Outfit number must be 1, 2, or 3");
+        });
+
+        test("returns 400 for invalid category", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/invalidCategory/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty("message", "Validation failed");
+            expect(res.body.errors).toContain("Invalid category");
+        });
+
+        test("returns 400 for invalid item ID", async () => {
+            mongoose.Types.ObjectId.isValid.mockImplementation((id) => id !== "invalidItemId");
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/tops/invalidItemId`
+            );
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty("message", "Validation failed");
+            expect(res.body.errors).toContain("Invalid item ID");
+        });
+
+        test("returns 400 with multiple validation errors", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(false);
+
+            const res = await request(app).patch(
+                `/api/user/badId/7/badCategory/badItemId`
+            );
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body).toHaveProperty("message", "Validation failed");
+            expect(res.body.errors).toContain("Invalid user ID");
+            expect(res.body.errors).toContain("Outfit number must be 1, 2, or 3");
+            expect(res.body.errors).toContain("Invalid category");
+            expect(res.body.errors).toContain("Invalid item ID");
+        });
+
+        test("returns 404 when user not found", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+            User.findById.mockResolvedValue(null);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toHaveProperty("message", "User not found");
+        });
+
+        test("updates outfit2 successfully", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const mockUser = {
+                _id: validUserId,
+                outfit1: {},
+                outfit2: {},
+                outfit3: {},
+                markModified: jest.fn(),
+                save: jest.fn().mockResolvedValue(true),
+            };
+
+            User.findById.mockResolvedValue(mockUser);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/2/bottoms/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(200);
+            expect(mockUser.markModified).toHaveBeenCalledWith("outfit2");
+        });
+
+        test("updates outfit3 successfully", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const mockUser = {
+                _id: validUserId,
+                outfit1: {},
+                outfit2: {},
+                outfit3: {},
+                markModified: jest.fn(),
+                save: jest.fn().mockResolvedValue(true),
+            };
+
+            User.findById.mockResolvedValue(mockUser);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/3/shoes/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(200);
+            expect(mockUser.markModified).toHaveBeenCalledWith("outfit3");
+        });
+
+        test("updates all valid categories", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const categories = ["tops", "bottoms", "shoes", "outerwear", "accessories"];
+
+            for (const category of categories) {
+                const mockUser = {
+                    _id: validUserId,
+                    outfit1: {},
+                    outfit2: {},
+                    outfit3: {},
+                    markModified: jest.fn(),
+                    save: jest.fn().mockResolvedValue(true),
+                };
+
+                User.findById.mockResolvedValue(mockUser);
+
+                const res = await request(app).patch(
+                    `/api/user/${validUserId}/1/${category}/${validItemId}`
+                );
+
+                expect(res.statusCode).toBe(200);
+            }
+        });
+
+        test("initializes outfit object if it doesn't exist", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+
+            const mockUser = {
+                _id: validUserId,
+                outfit1: null,
+                outfit2: {},
+                outfit3: {},
+                markModified: jest.fn(),
+                save: jest.fn().mockResolvedValue(true),
+            };
+
+            User.findById.mockResolvedValue(mockUser);
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(200);
+            expect(mockUser.outfit1).toEqual({ tops: validItemId });
+        });
+
+        test("returns 500 on server error", async () => {
+            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
+            User.findById.mockRejectedValue(new Error("Database error"));
+
+            const res = await request(app).patch(
+                `/api/user/${validUserId}/1/tops/${validItemId}`
+            );
+
+            expect(res.statusCode).toBe(500);
+            expect(res.body).toHaveProperty("message", "Failed to update outfit");
+        });
+    });
 });
