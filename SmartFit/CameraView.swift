@@ -22,7 +22,6 @@ struct CameraView: View {
             CameraViewControllerRepresentable(
                 controller: $controller,
                 onPhotoCaptured: { image in
-                    print("Photo captured, setting image and showing form")
                     capturedImage = IdentifiableImage(image: image)
                 }
             )

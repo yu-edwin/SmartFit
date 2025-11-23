@@ -13,13 +13,6 @@ struct PhotoFormView: View {
     @ObservedObject var wardrobeController: WardrobeController
     @State private var selectedOutfit: Int = 1
 
-    init(image: UIImage, isPresented: Binding<Bool>, wardrobeController: WardrobeController) {
-        self.image = image
-        self._isPresented = isPresented
-        self.wardrobeController = wardrobeController
-        print("PhotoFormView init - hasLoadedItems: \(wardrobeController.hasLoadedItems), items count: \(wardrobeController.model.items.count)")
-    }
-
     var equippedItems: [WardrobeItem] {
         guard let outfit = wardrobeController.outfits[selectedOutfit] else { return [] }
         return outfit.compactMap { category, itemId in
@@ -28,8 +21,7 @@ struct PhotoFormView: View {
     }
 
     var body: some View {
-        print("PhotoFormView body rendering")
-        return NavigationView {
+        NavigationView {
             VStack(spacing: 0) {
                 // Captured image
                 Image(uiImage: image)
@@ -42,7 +34,17 @@ struct PhotoFormView: View {
                 // Outfit selection at bottom
                 VStack(spacing: 16) {
                     // Equipped items icons
-                    if !equippedItems.isEmpty {
+                    if !wardrobeController.hasLoadedItems {
+                        // Loading state
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Loading wardrobe...")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.vertical, 8)
+                    } else if !equippedItems.isEmpty {
                         HStack(spacing: 12) {
                             ForEach(equippedItems) { item in
                                 if let imageDataString = item.image_data,
