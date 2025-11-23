@@ -6,5 +6,7 @@
     <string>SmartFit needs access to your camera to try on clothes virtually</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>SmartFit needs access to your photo library to upload clothing items</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>SmartFit needs permission to save generated outfit images to your photo library</string>
 </dict>
 </plist>

@@ -12,6 +12,9 @@ struct PhotoFormView: View {
     @Binding var isPresented: Bool
     @ObservedObject var wardrobeController: WardrobeController
     @State private var selectedOutfit: Int = 1
+    @State private var isGenerating = false
+    @State private var errorMessage: String?
+    @State private var generatedImage: String?
 
     var equippedItems: [WardrobeItem] {
         guard let outfit = wardrobeController.outfits[selectedOutfit] else { return [] }
@@ -108,13 +111,175 @@ struct PhotoFormView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Generate") {
-                        // Placeholder button - functionality to be implemented later
-                        print("Generate button tapped with outfit \(selectedOutfit)")
+                        Task {
+                            await generateOutfit()
+                        }
                     }
                     .fontWeight(.semibold)
+                    .disabled(isGenerating)
                     .accessibilityIdentifier("generateButton")
                 }
             }
+            .overlay {
+                if isGenerating {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                    ProgressView("Generating outfit...")
+                        .padding()
+                        .background(Color(UIColor.systemBackground))
+                        .cornerRadius(10)
+                }
+            }
+            .alert("Error", isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )) {
+                Button("OK") {
+                    errorMessage = nil
+                }
+            } message: {
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                }
+            }
+            .fullScreenCover(isPresented: Binding(
+                get: { generatedImage != nil },
+                set: { if !$0 { generatedImage = nil } }
+            )) {
+                if let generatedImage = generatedImage {
+                    GeneratedOutfitView(
+                        generatedImageBase64: generatedImage,
+                        isPresented: Binding(
+                            get: { self.generatedImage != nil },
+                            set: { if !$0 { self.generatedImage = nil } }
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private func generateOutfit() async {
+        isGenerating = true
+        errorMessage = nil
+
+        do {
+            let result = try await wardrobeController.model.generateOutfit(
+                outfitNumber: selectedOutfit,
+                picture: image
+            )
+            generatedImage = result
+            print("Successfully generated outfit image")
+        } catch {
+            errorMessage = error.localizedDescription
+            print("Failed to generate outfit: \(error)")
+        }
+
+        isGenerating = false
+    }
+}
+
+struct GeneratedOutfitView: View {
+    let generatedImageBase64: String
+    @Binding var isPresented: Bool
+    @State private var generatedUIImage: UIImage?
+    @State private var isSaving = false
+    @State private var showSaveSuccess = false
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+
+                if let generatedUIImage = generatedUIImage {
+                    Image(uiImage: generatedUIImage)
+                        .resizable()
+                        .scaledToFit()
+                        .accessibilityIdentifier("generatedOutfitImage")
+                } else {
+                    VStack(spacing: 16) {
+                        ProgressView()
+                        Text("Loading generated outfit...")
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                    .foregroundColor(.white)
+                    .accessibilityIdentifier("cancelButton")
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        saveToPhotoLibrary()
+                    }
+                    .foregroundColor(.white)
+                    .fontWeight(.semibold)
+                    .disabled(generatedUIImage == nil || isSaving)
+                    .accessibilityIdentifier("saveButton")
+                }
+            }
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(Color.black.opacity(0.8), for: .navigationBar)
+            .overlay {
+                if isSaving {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                    ProgressView("Saving...")
+                        .padding()
+                        .background(Color(UIColor.systemBackground))
+                        .cornerRadius(10)
+                }
+            }
+            .alert("Saved", isPresented: $showSaveSuccess) {
+                Button("OK") {
+                    isPresented = false
+                }
+            } message: {
+                Text("Outfit image saved to Photos")
+            }
+        }
+        .onAppear {
+            loadGeneratedImage()
+        }
+    }
+
+    private func loadGeneratedImage() {
+        // Parse base64 string to UIImage
+        let cleanBase64: String
+        if generatedImageBase64.contains(",") {
+            cleanBase64 = generatedImageBase64.components(separatedBy: ",").last ?? ""
+        } else {
+            cleanBase64 = generatedImageBase64
+        }
+
+        if let data = Data(base64Encoded: cleanBase64),
+           let uiImage = UIImage(data: data) {
+            generatedUIImage = uiImage
+            print("Successfully loaded generated outfit image")
+        } else {
+            print("Failed to parse generated image base64")
+        }
+    }
+
+    private func saveToPhotoLibrary() {
+        guard let imageToSave = generatedUIImage else {
+            print("No image to save")
+            return
+        }
+
+        isSaving = true
+        UIImageWriteToSavedPhotosAlbum(imageToSave, nil, nil, nil)
+
+        // Simulate brief save delay for UX
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            isSaving = false
+            showSaveSuccess = true
+            print("Saved generated outfit image to Photos")
         }
     }
 }

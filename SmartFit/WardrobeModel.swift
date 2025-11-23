@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 struct WardrobeItem: Identifiable, Codable {
     let id: String
@@ -31,7 +32,7 @@ struct UpdateWardrobeResponse: Codable {
 class WardrobeModel: ObservableObject {
     @Published var items: [WardrobeItem] = []
 
-    private let baseURL = "https://smartfit-backend-lhz4.onrender.com/api/wardrobe"
+    private let baseURL = "https://smartfit-development.onrender.com/api/wardrobe"
     private let urlSession: URLSession
 
     init(urlSession: URLSession = .shared) {
@@ -218,6 +219,55 @@ class WardrobeModel: ObservableObject {
             if let index = self.items.firstIndex(where: { $0.id == updatedItem.id }) {
                 self.items[index] = updatedItem
             }
+        }
+    }
+
+    func generateOutfit(outfitNumber: Int, picture: UIImage) async throws -> String {
+        guard let userId = getCurrentUserId() else {
+            throw NSError(domain: "User not logged in", code: -1)
+        }
+
+        let userBaseURL = "https://smartfit-development.onrender.com/api/user"
+        guard let url = URL(string: "\(userBaseURL)/\(userId)/generate-outfit/\(outfitNumber)") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        // Convert UIImage to base64 data URL
+        guard let imageData = picture.jpegData(compressionQuality: 0.8) else {
+            throw NSError(domain: "Failed to convert image", code: -1)
+        }
+        let base64Picture = "data:image/jpeg;base64," + imageData.base64EncodedString()
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "picture": base64Picture
+        ]
+
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await urlSession.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to generate outfit"]
+            )
+        }
+
+        // Parse response to get generated image
+        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let generatedImage = json["generatedImage"] as? String {
+            return generatedImage
+        } else {
+            throw NSError(domain: "Invalid response format", code: -1)
         }
     }
 }
