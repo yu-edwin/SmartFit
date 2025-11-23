@@ -2,7 +2,7 @@ import SwiftUI
 import PhotosUI
 
 struct WardrobeView: View {
-    @StateObject private var controller = WardrobeController()
+    @ObservedObject var controller: WardrobeController
 
     var body: some View {
         NavigationView {
@@ -390,5 +390,5 @@ struct AddItemSheet: View {
 }
 
 #Preview {
-    WardrobeView()
+    WardrobeView(controller: WardrobeController())
 }

@@ -13,6 +13,9 @@ class CameraViewController: UIViewController {
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private var currentCameraPosition: AVCaptureDevice.Position = .back
     private var currentInput: AVCaptureDeviceInput?
+    private let photoOutput = AVCapturePhotoOutput()
+
+    var onPhotoCaptured: ((UIImage) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +46,11 @@ class CameraViewController: UIViewController {
         captureSession.commitConfiguration()
     }
     
+    func capturePhoto() {
+        let settings = AVCapturePhotoSettings()
+        photoOutput.capturePhoto(with: settings, delegate: self)
+    }
+
     private func setupCamera() {
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                    for: .video,
@@ -52,6 +60,10 @@ class CameraViewController: UIViewController {
 
         captureSession.addInput(input)
         currentInput = input
+
+        if captureSession.canAddOutput(photoOutput) {
+            captureSession.addOutput(photoOutput)
+        }
 
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer?.videoGravity = .resizeAspectFill
@@ -65,6 +77,15 @@ class CameraViewController: UIViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            if let self = self, !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+            }
+        }
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -75,6 +96,20 @@ class CameraViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
+    }
+}
+
+extension CameraViewController: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard error == nil,
+              let imageData = photo.fileDataRepresentation(),
+              let image = UIImage(data: imageData) else {
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.onPhotoCaptured?(image)
+        }
     }
 }
 

@@ -80,8 +80,8 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
     }
 
     func loadItems() {
-        // // Only load items once
-        // guard !hasLoadedItems else { return }
+        // Only load items once
+        guard !hasLoadedItems else { return }
 
         Task {
             await MainActor.run {
