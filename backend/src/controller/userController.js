@@ -172,3 +172,62 @@ export const deleteUser = async (req, res) => {
             .json({ message: "DELETE request user failed. Try again" });
     }
 };
+
+// PATCH request: updates the equipped outfit for a particular user
+export const updateOutfit = async (req, res) => {
+    try {
+        const { userId, outfitNumber, category, itemId } = req.params;
+
+        // Validating request
+        const errors = [];
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            errors.push("Invalid user ID");
+        }
+        if (!["1", "2", "3"].includes(outfitNumber)) {
+            errors.push("Outfit number must be 1, 2, or 3");
+        }
+        const validCategories = ["tops", "bottoms", "shoes", "outerwear", "accessories"];
+        if (!validCategories.includes(category)) {
+            errors.push("Invalid category");
+        }
+        if (!itemId || !mongoose.Types.ObjectId.isValid(itemId)) {
+            errors.push("Invalid item ID");
+        }
+        if (errors.length > 0) {
+            return res.status(400).json({
+                message: "Validation failed",
+                errors: errors
+            });
+        }
+
+        // Find user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Build the outfit field name (outfit1, outfit2, or outfit3)
+        const outfitField = `outfit${outfitNumber}`;
+        if (!user[outfitField]) {
+            user[outfitField] = {};
+        }
+
+        // Update the specific category in the outfit
+        user[outfitField][category] = itemId;
+
+        // Mark the field as modified (important for nested objects)
+        user.markModified(outfitField);
+
+        // Save the user
+        await user.save();
+
+        console.log(`Updated ${outfitField}.${category} for user ${userId}`);
+        res.status(200).json({
+            message: "Outfit updated successfully",
+            outfit: user[outfitField]
+        });
+    } catch (err) {
+        console.error(`Failed to update outfit: ${err}`);
+        res.status(500).json({ message: "Failed to update outfit" });
+    }
+};
