@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Wardrobeitem from "../models/clothingSchema.js";
-// import { analyzeClothingImage } from "../services/geminiService.js";
+import { analyzeClothingImage } from "../services/geminiService.js";
 
 // GET request: Get all items in wardrobe
 export const getAllItems = async (req, res) => {
