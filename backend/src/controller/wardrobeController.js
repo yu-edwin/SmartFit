@@ -141,6 +141,12 @@ export const importFromUrl = async (req, res) => {
 
         const scrapedData = await scrapeProductInfo(productUrl);
 
+        let description;
+        // Calling on gemini service
+        if (scrapedData.image_data) {
+            description = await analyzeClothingImage(scrapedData.image_data);
+        }
+
         const newItem = await Wardrobeitem.create({
             userId,
             name: scrapedData.name,
@@ -152,6 +158,7 @@ export const importFromUrl = async (req, res) => {
             material: scrapedData.material || "",
             item_url: productUrl,
             image_data: scrapedData.image_data,
+            description: description,
         });
 
         res.status(201).json({
