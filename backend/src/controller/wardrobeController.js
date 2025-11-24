@@ -1,3 +1,7 @@
+import {
+    scrapeProductInfo,
+    isValidProductUrl,
+} from "../services/productScraperService.js";
 import mongoose from "mongoose";
 import Wardrobeitem from "../models/clothingSchema.js";
 import { analyzeClothingImage } from "../services/geminiService.js";
@@ -115,6 +119,49 @@ export const updateClothingItem = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: `Failed to update clothing item... HERE IS ERROR: ${err}`,
+        });
+    }
+};
+
+export const importFromUrl = async (req, res) => {
+    try {
+        const { userId, productUrl, size = "M" } = req.body;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                message: "Valid user ID required",
+            });
+        }
+
+        if (!productUrl || !isValidProductUrl(productUrl)) {
+            return res.status(400).json({
+                message: "Valid product URL required",
+            });
+        }
+
+        const scrapedData = await scrapeProductInfo(productUrl);
+
+        const newItem = await Wardrobeitem.create({
+            userId,
+            name: scrapedData.name,
+            category: scrapedData.category,
+            brand: scrapedData.brand || "",
+            price: scrapedData.price || 0,
+            color: scrapedData.color || "Not specified",
+            size: size.toUpperCase(),
+            material: scrapedData.material || "",
+            item_url: productUrl,
+            image_data: scrapedData.image_data,
+        });
+
+        res.status(201).json({
+            data: newItem,
+            scraped: scrapedData.scraped_successfully,
+        });
+    } catch (error) {
+        console.error("Import error:", error);
+        res.status(500).json({
+            message: `Import failed: ${error.message}`,
         });
     }
 };

@@ -7,19 +7,20 @@ struct WardrobeItem: Identifiable, Codable {
     let category: String
     let name: String
     let brand: String?
-// swiftlint:disable:next identifier_name
+    // swiftlint:disable:next identifier_name
     let image_data: String?
     let price: Double?
     let color: String?
     let size: String?
     let material: String?
-// swiftlint:disable:next identifier_name
+    // swiftlint:disable:next identifier_name
     let item_url: String?
+
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-// swiftlint:disable:next identifier_name
+        // swiftlint:disable:next identifier_name
         case userId, category, name, brand, image_data, price
-// swiftlint:disable:next identifier_name
+        // swiftlint:disable:next identifier_name
         case color, size, material, item_url
     }
 }
@@ -128,7 +129,8 @@ class WardrobeModel: ObservableObject {
             print("Response status code: \(httpResponse.statusCode)")
             if httpResponse.statusCode != 201 && httpResponse.statusCode != 200 {
                 throw NSError(
-                    domain: "Server Error", code: httpResponse.statusCode,
+                    domain: "Server Error",
+                    code: httpResponse.statusCode,
                     userInfo: [NSLocalizedDescriptionKey: "Failed to add item"]
                 )
             }
@@ -159,6 +161,7 @@ class WardrobeModel: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
         // 2. Build body with only non-nil values (partial update)
         var body: [String: Any] = [:]
 
@@ -306,7 +309,7 @@ class WardrobeModel: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
-            "picture": base64Picture
+                  "picture": base64Picture
         ]
 
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
@@ -354,5 +357,39 @@ class WardrobeModel: ObservableObject {
             }
         }
         throw NSError(domain: "Invalid response format", code: -1)
+      
+      
+     
+    func importFromUrl(productUrl: String, size: String) async throws {
+        guard let userId = getCurrentUserId() else {
+            throw NSError(domain: "User not logged in", code: -1)
+        }
+
+        guard let url = URL(string: "\(baseURL)/import-url") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "userId": userId,
+            "productUrl": productUrl,
+            "size": size.uppercased()
+        ]
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (_, response) = try await urlSession.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse {
+            print("Import response: \(httpResponse.statusCode)")
+            if httpResponse.statusCode != 201 && httpResponse.statusCode != 200 {
+                throw NSError(domain: "Import failed", code: httpResponse.statusCode)
+            }
+        }
+
+        try await fetchItems()
     }
 }
