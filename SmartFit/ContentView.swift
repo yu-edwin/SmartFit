@@ -16,14 +16,16 @@ struct ContentView: View {
 }
 
 struct MainTabView: View {
+    @StateObject private var wardrobeController = WardrobeController()
+
     var body: some View {
         TabView {
-            WardrobeView()
+            WardrobeView(controller: wardrobeController)
                 .tabItem {
                     Label("Wardrobe", systemImage: "hanger")
                 }
 
-            CameraView()
+            CameraView(wardrobeController: wardrobeController)
                 .tabItem {
                     Label("Camera", systemImage: "camera")
                 }

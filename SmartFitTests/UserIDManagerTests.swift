@@ -32,6 +32,7 @@ struct UserIDManagerTests {
 
         // When: Access user ID multiple times
         let firstAccess = UserIDManager.shared.userID
+        UserDefaults.standard.synchronize()
         let secondAccess = UserIDManager.shared.userID
         let thirdAccess = UserIDManager.shared.userID
 
