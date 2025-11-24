@@ -33,7 +33,7 @@ struct UpdateWardrobeResponse: Codable {
 class WardrobeModel: ObservableObject {
     @Published var items: [WardrobeItem] = []
 
-    private let baseURL = "https://smartfit-d9yj.onrender.com/api/wardrobe"
+    private let baseURL = "https://smartfit-development.onrender.com/api/wardrobe"
     private let urlSession: URLSession
 
     init(urlSession: URLSession = .shared) {
@@ -235,7 +235,7 @@ class WardrobeModel: ObservableObject {
         }
         print("User ID: \(userId)")
 
-        let userBaseURL = "https://smartfit-d9yj.onrender.com/api/user"
+        let userBaseURL = "https://smartfit-development.onrender.com/api/user"
         let urlString = "\(userBaseURL)/\(userId)/\(outfitNumber)/\(category)/\(itemId)"
         print("URL: \(urlString)")
 
@@ -285,7 +285,7 @@ class WardrobeModel: ObservableObject {
         }
         print("User ID: \(userId)")
         
-        let userBaseURL = "https://smartfit-d9yj.onrender.com/api/user"
+        let userBaseURL = "https://smartfit-development.onrender.com/api/user"
         let urlString = "\(userBaseURL)/\(userId)/generate-outfit/\(outfitNumber)"
         print("URL: \(urlString)")
         
