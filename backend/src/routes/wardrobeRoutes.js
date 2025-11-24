@@ -4,7 +4,7 @@ import {
     createClothingItem,
     deleteClothingItem,
     updateClothingItem,
-    importFromUrl
+    importFromUrl,
 } from "../controller/wardrobeController.js";
 
 const router = express.Router();

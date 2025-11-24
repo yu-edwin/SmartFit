@@ -91,21 +91,6 @@ struct WardrobeView: View {
                                 .background(Color(UIColor.systemBackground))
                             }
                         }
-
-                        // Floating add button
-                        Button {
-                            controller.showAddSheet = true
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.white)
-                                .frame(width: 56, height: 56)
-                                .background(Color.blue)
-                                .clipShape(Circle())
-                                .shadow(radius: 4)
-                        }
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 60)
                     }
                 }
             }
@@ -198,7 +183,8 @@ struct WardrobeView: View {
                                 .rotationEffect(.degrees(showAddOptions ? 45 : 0))
                         }
                     }
-                    .padding(20)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 60)
                 }
             }
             // URL import sheet

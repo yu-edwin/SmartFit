@@ -32,7 +32,7 @@ struct UpdateWardrobeResponse: Codable {
 class WardrobeModel: ObservableObject {
     @Published var items: [WardrobeItem] = []
 
-    private let baseURL = "http://localhost:3000/api/wardrobe"
+    private let baseURL = "https://smartfit-development.onrender.com/api/wardrobe"
     private let urlSession: URLSession
 
     init(urlSession: URLSession = .shared) {
