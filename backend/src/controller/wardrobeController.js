@@ -46,10 +46,10 @@ export const createClothingItem = async (req, res) => {
                 .json({ message: "User id not valid. Try again" });
         }
 
-        // // Calling on gemini service
-        // if (image_data) {
-        //   description = await analyzeClothingImage(image_data);
-        // }
+        // Calling on gemini service
+        if (image_data) {
+          description = await analyzeClothingImage(image_data);
+        }
 
         const newItem = await Wardrobeitem.create({
             userId,
