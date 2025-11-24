@@ -10,12 +10,12 @@
 
 **Backlog**
 - Story Point Estimate: 45
-- Tickets Assigned: ?
-- Tickets Completed:  ?
+- Tickets Assigned: 9
+- Tickets Completed:  9
 - Story Points Distribution:
 1. Justin Dong: 10
-2. Daiki Koike: 16?
-3. Edwin Yu: 19?
+2. Daiki Koike: 16
+3. Edwin Yu: 19
 
 ### **Process Improvement Plan**
 
@@ -84,7 +84,6 @@
 3. Local Branch (Branch for a specific task/ticket on the backlog)
 **Branch Protection Rules**
 1. Main only accepts branches with passing CI and peer reviewed PR
-???
 
 **Pull Request & Review Process**
 1. Every PR is associated with a ticket and should be assigned when creating the PR
@@ -155,7 +154,8 @@
 ### Product Owner Demonstration
 
 **Demo**
-[Video Demo of Sprint 3 Results]() ?
+![Image of SmartFit Wardrobe](../assets/PRD/SmartFitImage.png)
+[Video Recording]()
 
 **FeedBack**
 1. Upload by link sometimes adds too much info and makes the clothing item card look clunky
@@ -186,4 +186,4 @@
 3. Product owner feedback
 4. Merge conflicts (minor) and confusing swift unit testing
 ## Section 8: Working MVP Deliverable (10 points)
-[SmartFit Application] (?)
+[SmartFit Application] (https://appetize.io/app/b_dvvsesm4bgqbi6olyut4cno4w4)
