@@ -48,7 +48,7 @@ export const createClothingItem = async (req, res) => {
 
         // Calling on gemini service
         if (image_data) {
-          description = await analyzeClothingImage(image_data);
+            description = await analyzeClothingImage(image_data);
         }
 
         const newItem = await Wardrobeitem.create({

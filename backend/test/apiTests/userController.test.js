@@ -324,14 +324,19 @@ describe("User API", () => {
             );
 
             expect(res.statusCode).toBe(200);
-            expect(res.body).toHaveProperty("message", "Outfit updated successfully");
+            expect(res.body).toHaveProperty(
+                "message",
+                "Outfit updated successfully"
+            );
             expect(res.body).toHaveProperty("outfit");
             expect(mockUser.markModified).toHaveBeenCalledWith("outfit1");
             expect(mockUser.save).toHaveBeenCalled();
         });
 
         test("returns 400 for invalid user ID", async () => {
-            mongoose.Types.ObjectId.isValid.mockImplementation((id) => id !== "invalidUserId");
+            mongoose.Types.ObjectId.isValid.mockImplementation(
+                (id) => id !== "invalidUserId"
+            );
 
             const res = await request(app).patch(
                 `/api/user/invalidUserId/1/tops/${validItemId}`
@@ -351,7 +356,9 @@ describe("User API", () => {
 
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty("message", "Validation failed");
-            expect(res.body.errors).toContain("Outfit number must be 1, 2, or 3");
+            expect(res.body.errors).toContain(
+                "Outfit number must be 1, 2, or 3"
+            );
         });
 
         test("returns 400 for invalid category", async () => {
@@ -367,7 +374,9 @@ describe("User API", () => {
         });
 
         test("returns 400 for invalid item ID", async () => {
-            mongoose.Types.ObjectId.isValid.mockImplementation((id) => id !== "invalidItemId");
+            mongoose.Types.ObjectId.isValid.mockImplementation(
+                (id) => id !== "invalidItemId"
+            );
 
             const res = await request(app).patch(
                 `/api/user/${validUserId}/1/tops/invalidItemId`
@@ -388,7 +397,9 @@ describe("User API", () => {
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty("message", "Validation failed");
             expect(res.body.errors).toContain("Invalid user ID");
-            expect(res.body.errors).toContain("Outfit number must be 1, 2, or 3");
+            expect(res.body.errors).toContain(
+                "Outfit number must be 1, 2, or 3"
+            );
             expect(res.body.errors).toContain("Invalid category");
             expect(res.body.errors).toContain("Invalid item ID");
         });
@@ -452,7 +463,13 @@ describe("User API", () => {
         test("updates all valid categories", async () => {
             mongoose.Types.ObjectId.isValid.mockReturnValue(true);
 
-            const categories = ["tops", "bottoms", "shoes", "outerwear", "accessories"];
+            const categories = [
+                "tops",
+                "bottoms",
+                "shoes",
+                "outerwear",
+                "accessories",
+            ];
 
             for (const category of categories) {
                 const mockUser = {
@@ -505,7 +522,10 @@ describe("User API", () => {
             );
 
             expect(res.statusCode).toBe(500);
-            expect(res.body).toHaveProperty("message", "Failed to update outfit");
+            expect(res.body).toHaveProperty(
+                "message",
+                "Failed to update outfit"
+            );
         });
     });
 
@@ -523,7 +543,7 @@ describe("User API", () => {
                 _id: validUserId,
                 outfit1: {
                     tops: validItemId1,
-                    bottoms: validItemId2
+                    bottoms: validItemId2,
                 },
             };
 
@@ -531,25 +551,30 @@ describe("User API", () => {
                 {
                     _id: validItemId1,
                     name: "Blue Shirt",
-                    description: "A nice blue shirt"
+                    description: "A nice blue shirt",
                 },
                 {
                     _id: validItemId2,
                     name: "Black Jeans",
-                    description: "Dark black jeans"
-                }
+                    description: "Dark black jeans",
+                },
             ];
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImage.mockResolvedValue("data:image/png;base64,mockGeneratedImage");
+            generateOutfitImage.mockResolvedValue(
+                "data:image/png;base64,mockGeneratedImage"
+            );
 
             const res = await request(app)
                 .post(`/api/user/${validUserId}/generate-outfit/1`)
                 .send({ picture: validPicture });
 
             expect(res.statusCode).toBe(200);
-            expect(res.body).toHaveProperty("message", "Outfit generated successfully");
+            expect(res.body).toHaveProperty(
+                "message",
+                "Outfit generated successfully"
+            );
             expect(res.body).toHaveProperty("generatedImage");
             expect(generateOutfitImage).toHaveBeenCalledWith(
                 "A nice blue shirt Dark black jeans ",
@@ -578,7 +603,9 @@ describe("User API", () => {
 
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty("message", "Validation failed");
-            expect(res.body.errors).toContain("Outfit number must be 1, 2, or 3");
+            expect(res.body.errors).toContain(
+                "Outfit number must be 1, 2, or 3"
+            );
         });
 
         test("returns 400 for missing picture", async () => {
@@ -590,7 +617,9 @@ describe("User API", () => {
 
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty("message", "Validation failed");
-            expect(res.body.errors).toContain("Picture is required and must be a string");
+            expect(res.body.errors).toContain(
+                "Picture is required and must be a string"
+            );
         });
 
         test("returns 400 for invalid picture format", async () => {
@@ -602,7 +631,9 @@ describe("User API", () => {
 
             expect(res.statusCode).toBe(400);
             expect(res.body).toHaveProperty("message", "Validation failed");
-            expect(res.body.errors).toContain("Picture must be a valid base64 image data URL");
+            expect(res.body.errors).toContain(
+                "Picture must be a valid base64 image data URL"
+            );
         });
 
         test("returns 404 when user not found", async () => {
@@ -649,13 +680,15 @@ describe("User API", () => {
                 {
                     _id: validItemId1,
                     name: "Blue Shirt",
-                    description: null  // No description
-                }
+                    description: null, // No description
+                },
             ];
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImage.mockResolvedValue("data:image/png;base64,mockGeneratedImage");
+            generateOutfitImage.mockResolvedValue(
+                "data:image/png;base64,mockGeneratedImage"
+            );
 
             const res = await request(app)
                 .post(`/api/user/${validUserId}/generate-outfit/1`)
@@ -663,10 +696,7 @@ describe("User API", () => {
 
             expect(res.statusCode).toBe(200);
             // Prompt should be empty string since no descriptions
-            expect(generateOutfitImage).toHaveBeenCalledWith(
-                "",
-                validPicture
-            );
+            expect(generateOutfitImage).toHaveBeenCalledWith("", validPicture);
         });
 
         test("works with outfit2 and outfit3", async () => {
@@ -679,7 +709,7 @@ describe("User API", () => {
             };
 
             const mockClothingItems = [
-                { _id: validItemId1, description: "Item 1" }
+                { _id: validItemId1, description: "Item 1" },
             ];
 
             User.findById.mockResolvedValue(mockUser);
@@ -708,7 +738,10 @@ describe("User API", () => {
                 .send({ picture: validPicture });
 
             expect(res.statusCode).toBe(500);
-            expect(res.body).toHaveProperty("message", "Failed to generate outfit");
+            expect(res.body).toHaveProperty(
+                "message",
+                "Failed to generate outfit"
+            );
         });
     });
 });

@@ -188,7 +188,13 @@ export const updateOutfit = async (req, res) => {
         if (!["1", "2", "3"].includes(outfitNumber)) {
             errors.push("Outfit number must be 1, 2, or 3");
         }
-        const validCategories = ["tops", "bottoms", "shoes", "outerwear", "accessories"];
+        const validCategories = [
+            "tops",
+            "bottoms",
+            "shoes",
+            "outerwear",
+            "accessories",
+        ];
         if (!validCategories.includes(category)) {
             errors.push("Invalid category");
         }
@@ -198,7 +204,7 @@ export const updateOutfit = async (req, res) => {
         if (errors.length > 0) {
             return res.status(400).json({
                 message: "Validation failed",
-                errors: errors
+                errors: errors,
             });
         }
 
@@ -226,7 +232,7 @@ export const updateOutfit = async (req, res) => {
         console.log(`Updated ${outfitField}.${category} for user ${userId}`);
         res.status(200).json({
             message: "Outfit updated successfully",
-            outfit: user[outfitField]
+            outfit: user[outfitField],
         });
     } catch (err) {
         console.error(`Failed to update outfit: ${err}`);
@@ -256,7 +262,7 @@ export const generateOutfit = async (req, res) => {
         if (errors.length > 0) {
             return res.status(400).json({
                 message: "Validation failed",
-                errors: errors
+                errors: errors,
             });
         }
 
@@ -276,7 +282,7 @@ export const generateOutfit = async (req, res) => {
 
         // Fetch all wardrobe items
         const wardrobeItems = await ClothingItem.find({
-            _id: { $in: itemIds }
+            _id: { $in: itemIds },
         });
 
         // Build prompt with item descriptions
@@ -288,7 +294,9 @@ export const generateOutfit = async (req, res) => {
         });
 
         // Generate outfit image using Gemini
-        console.log(`Generate outfit requested for user ${userId}, outfit ${outfitNumber}`);
+        console.log(
+            `Generate outfit requested for user ${userId}, outfit ${outfitNumber}`
+        );
         const generatedImage = await generateOutfitImage(prompt, picture);
 
         // Return generated outfit image
@@ -297,7 +305,7 @@ export const generateOutfit = async (req, res) => {
             userId: userId,
             outfitNumber: outfitNumber,
             outfit: outfit,
-            generatedImage: generatedImage
+            generatedImage: generatedImage,
         });
     } catch (err) {
         console.error(`Failed to generate outfit: ${err}`);

@@ -59,10 +59,7 @@ export const generateOutfitImage = async (prompt, picture) => {
     const genAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
     // Clean base64 data prefix
-    const cleanBase64 = picture.replace(
-        /^data:image\/[^;]+;base64,/,
-        ""
-    );
+    const cleanBase64 = picture.replace(/^data:image\/[^;]+;base64,/, "");
 
     try {
         const contents = [
@@ -73,7 +70,7 @@ export const generateOutfitImage = async (prompt, picture) => {
                 },
             },
             {
-                text: `Generate an outfit visualization on this person wearing the following items: ${prompt}`
+                text: `Generate an outfit visualization on this person wearing the following items: ${prompt}`,
             },
         ];
 
@@ -92,10 +89,14 @@ export const generateOutfitImage = async (prompt, picture) => {
 
             for (const part of parts) {
                 if (part.inlineData) {
-                    console.log(`Found inlineData with mimeType: ${part.inlineData.mimeType}`);
+                    console.log(
+                        `Found inlineData with mimeType: ${part.inlineData.mimeType}`
+                    );
                     // Return base64 image with data URL prefix
                     const base64Image = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                    console.log(`Returning base64 image, length: ${base64Image.length}`);
+                    console.log(
+                        `Returning base64 image, length: ${base64Image.length}`
+                    );
                     return base64Image;
                 }
             }
