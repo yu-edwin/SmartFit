@@ -122,12 +122,23 @@ describe("Gemini Service", () => {
         const testPrompt = "blue jeans red shirt white sneakers";
 
         test("successfully generates outfit image", async () => {
-            const mockGeneratedImage = "data:image/png;base64,generatedImageData";
-            mockGenerateContent.mockResolvedValue({ text: mockGeneratedImage });
+            const mockGeneratedImage = "generatedImageData";
+            mockGenerateContent.mockResolvedValue({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: mockGeneratedImage
+                            }
+                        }]
+                    }
+                }]
+            });
 
             const result = await generateOutfitImage(testPrompt, testPicture);
 
-            expect(result).toBe(mockGeneratedImage);
+            expect(result).toBe(`data:image/png;base64,${mockGeneratedImage}`);
             expect(GoogleGenAI).toHaveBeenCalledWith({ apiKey: "test-api-key" });
             expect(mockGenerateContent).toHaveBeenCalledWith({
                 model: "gemini-2.5-flash-image",
@@ -146,12 +157,23 @@ describe("Gemini Service", () => {
         });
 
         test("handles empty prompt", async () => {
-            const mockGeneratedImage = "data:image/png;base64,generated";
-            mockGenerateContent.mockResolvedValue({ text: mockGeneratedImage });
+            const mockGeneratedImage = "generated";
+            mockGenerateContent.mockResolvedValue({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: mockGeneratedImage
+                            }
+                        }]
+                    }
+                }]
+            });
 
             const result = await generateOutfitImage("", testPicture);
 
-            expect(result).toBe(mockGeneratedImage);
+            expect(result).toBe(`data:image/png;base64,${mockGeneratedImage}`);
             expect(mockGenerateContent).toHaveBeenCalledWith(
                 expect.objectContaining({
                     contents: expect.arrayContaining([
@@ -165,7 +187,18 @@ describe("Gemini Service", () => {
 
         test("cleans base64 data prefix from picture", async () => {
             const mockGeneratedImage = "generated-image";
-            mockGenerateContent.mockResolvedValue({ text: mockGeneratedImage });
+            mockGenerateContent.mockResolvedValue({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: mockGeneratedImage
+                            }
+                        }]
+                    }
+                }]
+            });
 
             await generateOutfitImage(testPrompt, testPicture);
 
@@ -200,7 +233,18 @@ describe("Gemini Service", () => {
         });
 
         test("uses correct model (gemini-2.5-flash-image)", async () => {
-            mockGenerateContent.mockResolvedValue({ text: "generated" });
+            mockGenerateContent.mockResolvedValue({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: "generated"
+                            }
+                        }]
+                    }
+                }]
+            });
 
             await generateOutfitImage(testPrompt, testPicture);
 
@@ -214,11 +258,22 @@ describe("Gemini Service", () => {
         test("handles complex prompts with multiple items", async () => {
             const complexPrompt = "vintage denim jacket with patches black skinny jeans leather boots with buckles";
             const mockGeneratedImage = "generated-complex-outfit";
-            mockGenerateContent.mockResolvedValue({ text: mockGeneratedImage });
+            mockGenerateContent.mockResolvedValue({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: mockGeneratedImage
+                            }
+                        }]
+                    }
+                }]
+            });
 
             const result = await generateOutfitImage(complexPrompt, testPicture);
 
-            expect(result).toBe(mockGeneratedImage);
+            expect(result).toBe(`data:image/png;base64,${mockGeneratedImage}`);
             expect(mockGenerateContent).toHaveBeenCalledWith(
                 expect.objectContaining({
                     contents: expect.arrayContaining([
