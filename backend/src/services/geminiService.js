@@ -83,9 +83,27 @@ export const generateOutfitImage = async (prompt, picture) => {
             contents: contents,
         });
 
-        const generatedImage = response.text;
+        console.log("Gemini API response received");
 
-        return generatedImage;
+        // Extract image from inlineData
+        if (response.candidates && response.candidates[0]?.content?.parts) {
+            const parts = response.candidates[0].content.parts;
+            console.log(`Response has ${parts.length} parts`);
+
+            for (const part of parts) {
+                if (part.inlineData) {
+                    console.log(`Found inlineData with mimeType: ${part.inlineData.mimeType}`);
+                    // Return base64 image with data URL prefix
+                    const base64Image = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    console.log(`Returning base64 image, length: ${base64Image.length}`);
+                    return base64Image;
+                }
+            }
+        }
+
+        // No image found in response
+        console.error("No inlineData image found in Gemini response");
+        throw new Error("Gemini API did not return an image");
     } catch (error) {
         console.error("Gemini API Error:", error);
         throw new Error(`Gemini API Error: ${error.message}`);
