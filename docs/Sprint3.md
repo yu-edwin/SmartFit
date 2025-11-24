@@ -170,7 +170,7 @@
 - Sprint 2: 34 Points
 **Sprint 3**
 - Story Point Estimate: 45
-- Sprint 3 Completed: ? Points
+- Sprint 3 Completed: 45 Points
 
 **Process Retrospecive**
 
