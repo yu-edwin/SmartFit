@@ -333,7 +333,6 @@ export const scrapeProductInfo = async (productUrl) => {
 export const isValidProductUrl = (url) => {
   try {
     // Only check if it looks like a valid URL (no domain restriction)
-    // eslint-disable-next-line no-new
     new URL(url);
     // add here to reject unsupported URLs
     return getSiteConfig(url) !== null;
