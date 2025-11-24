@@ -30,7 +30,7 @@ class AuthenticationController: ObservableObject {
     // MARK: - Authentication Methods
 
     func login(email: String, password: String, completion: @escaping (Bool, String?) -> Void) {
-        guard let url = URL(string: "https://smartfit-development.onrender.com/api/user/login") else {
+        guard let url = URL(string: "https://smartfit-d9yj.onrender.com/api/user/login") else {
             completion(false, "Invalid URL")
             return
         }
@@ -77,7 +77,7 @@ class AuthenticationController: ObservableObject {
     }
 
     func register(name: String, email: String, password: String, completion: @escaping (Bool, String?) -> Void) {
-        guard let url = URL(string: "https://smartfit-development.onrender.com/api/user/register") else {
+        guard let url = URL(string: "https://smartfit-d9yj.onrender.com/api/user/register") else {
             completion(false, "Invalid URL")
             return
         }

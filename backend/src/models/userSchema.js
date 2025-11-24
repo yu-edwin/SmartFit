@@ -22,6 +22,18 @@ const userSchema = new Schema({
         default: () => Date.now(),
         immutable: true,
     },
+    outfit1: {
+        type: Object,
+        default: {},
+    },
+    outfit2: {
+        type: Object,
+        default: {},
+    },
+    outfit3: {
+        type: Object,
+        default: {},
+    },
 });
 
 export default mongoose.model("User", userSchema);

@@ -87,8 +87,8 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
     }
 
     func loadItems() {
-        // // Only load items once
-        // guard !hasLoadedItems else { return }
+        // Only load items once
+        guard !hasLoadedItems else { return }
 
         Task {
             await MainActor.run {
@@ -202,10 +202,41 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
     func equipItem(itemId: String, category: String) {
         print("Equipping item \(itemId) in category \(category) to outfit \(selectedOutfit)")
         var updatedOutfits = outfits
-        updatedOutfits[selectedOutfit]?[category] = itemId
-        outfits = updatedOutfits
+
+        // Toggle: if item is already equipped in this category, unequip it
+        if updatedOutfits[selectedOutfit]?[category] == itemId {
+            updatedOutfits[selectedOutfit]?[category] = nil
+            print("Unequipping item \(itemId) from outfit \(selectedOutfit)")
+
+            // Update local state
+            outfits = updatedOutfits
+            saveOutfits()
+            // TODO: Add backend call for unequipping when backend supports it
+        } else {
+            updatedOutfits[selectedOutfit]?[category] = itemId
+            print("Equipping item \(itemId) to outfit \(selectedOutfit)")
+
+            // Update local state
+            outfits = updatedOutfits
+            saveOutfits()
+
+            // Sync with backend
+            Task {
+                do {
+                    try await model.updateOutfit(
+                        outfitNumber: selectedOutfit,
+                        category: category,
+                        itemId: itemId
+                    )
+                    print("Successfully synced outfit to backend")
+                } catch {
+                    print("Failed to sync outfit to backend: \(error)")
+                    // Note: Local state is already updated, backend sync failed
+                }
+            }
+        }
+
         print("Updated outfit \(selectedOutfit): \(currentEquippedOutfit)")
-        saveOutfits()
     }
 
     // Function for PUT clothingItem request

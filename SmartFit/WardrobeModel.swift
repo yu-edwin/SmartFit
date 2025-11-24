@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 struct WardrobeItem: Identifiable, Codable {
     let id: String
@@ -32,7 +33,7 @@ struct UpdateWardrobeResponse: Codable {
 class WardrobeModel: ObservableObject {
     @Published var items: [WardrobeItem] = []
 
-    private let baseURL = "https://smartfit-development.onrender.com/api/wardrobe"
+    private let baseURL = "https://smartfit-d9yj.onrender.com/api/wardrobe"
     private let urlSession: URLSession
 
     init(urlSession: URLSession = .shared) {
@@ -224,6 +225,141 @@ class WardrobeModel: ObservableObject {
         }
     }
 
+    func updateOutfit(outfitNumber: Int, category: String, itemId: String) async throws {
+        print("=== WardrobeModel.updateOutfit called ===")
+        print("Outfit: \(outfitNumber), Category: \(category), ItemId: \(itemId)")
+
+        guard let userId = getCurrentUserId() else {
+            print("ERROR: User not logged in")
+            throw NSError(domain: "User not logged in", code: -1)
+        }
+        print("User ID: \(userId)")
+
+        let userBaseURL = "https://smartfit-d9yj.onrender.com/api/user"
+        let urlString = "\(userBaseURL)/\(userId)/\(outfitNumber)/\(category)/\(itemId)"
+        print("URL: \(urlString)")
+
+        guard let url = URL(string: urlString) else {
+            print("ERROR: Invalid URL")
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        print("Sending PATCH request to backend...")
+
+        let (data, response) = try await urlSession.data(for: request)
+        print("=== Received response from backend ===")
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("ERROR: Invalid response type")
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+
+        print("HTTP Status Code: \(httpResponse.statusCode)")
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            print("ERROR: Server returned error status code")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Response body: \(responseString)")
+            }
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to update outfit"]
+            )
+        }
+
+        print("Successfully updated outfit on backend")
+    }
+
+    func generateOutfit(outfitNumber: Int, picture: UIImage) async throws -> String {
+        print("=== WardrobeModel.generateOutfit called ===")
+        print("Outfit number: \(outfitNumber)")
+
+        guard let userId = getCurrentUserId() else {
+            print("ERROR: User not logged in")
+            throw NSError(domain: "User not logged in", code: -1)
+        }
+        print("User ID: \(userId)")
+
+        let userBaseURL = "https://smartfit-d9yj.onrender.com/api/user"
+        let urlString = "\(userBaseURL)/\(userId)/generate-outfit/\(outfitNumber)"
+        print("URL: \(urlString)")
+
+        guard let url = URL(string: urlString) else {
+            print("ERROR: Invalid URL")
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        // Convert UIImage to base64 data URL
+        print("Converting image to base64...")
+        guard let imageData = picture.jpegData(compressionQuality: 0.8) else {
+            print("ERROR: Failed to convert image to JPEG data")
+            throw NSError(domain: "Failed to convert image", code: -1)
+        }
+        print("Image data size: \(imageData.count) bytes")
+        let base64Picture = "data:image/jpeg;base64," + imageData.base64EncodedString()
+        print("Base64 string length: \(base64Picture.count)")
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+                  "picture": base64Picture
+        ]
+
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        print("Request body size: \(request.httpBody?.count ?? 0) bytes")
+        print("Sending POST request to backend...")
+
+        let (data, response) = try await urlSession.data(for: request)
+        print("=== Received response from backend ===")
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("ERROR: Invalid response type")
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+
+        print("HTTP Status Code: \(httpResponse.statusCode)")
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            print("ERROR: Server returned error status code")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Response body: \(responseString)")
+            }
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to generate outfit"]
+            )
+        }
+
+        // Parse response to get generated image
+        print("Parsing response JSON...")
+        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            print("JSON keys: \(json.keys)")
+            if let generatedImage = json["generatedImage"] as? String {
+                print("Successfully extracted generatedImage from response")
+                print("Generated image length: \(generatedImage.count)")
+                return generatedImage
+            } else {
+                print("ERROR: generatedImage key not found in response")
+                print("Full response: \(json)")
+            }
+        } else {
+            print("ERROR: Response is not a valid JSON dictionary")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Response body: \(responseString)")
+            }
+        }
+        throw NSError(domain: "Invalid response format", code: -1)
+      
+      
+     
     func importFromUrl(productUrl: String, size: String) async throws {
         guard let userId = getCurrentUserId() else {
             throw NSError(domain: "User not logged in", code: -1)

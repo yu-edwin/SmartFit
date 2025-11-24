@@ -5,7 +5,6 @@ import connectToDB from "./src/config/mongoDBConnection.js";
 import seedData from "./src/config/seedData.js";
 import wardrobeRoutes from "./src/routes/wardrobeRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
-import outfitRoutes from "./src/routes/outfitRoutes.js";
 
 dotenv.config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" });
 const app = express();
@@ -18,7 +17,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/api/outfit", outfitRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/wardrobe", wardrobeRoutes);
 console.log("Routes are supported");
