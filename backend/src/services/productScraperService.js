@@ -335,7 +335,8 @@ export const isValidProductUrl = (url) => {
     // Only check if it looks like a valid URL (no domain restriction)
     // eslint-disable-next-line no-new
     new URL(url);
-    return true;
+    // add here to reject unsupported URLs
+    return getSiteConfig(url) !== null;
   } catch {
     return false;
   }
