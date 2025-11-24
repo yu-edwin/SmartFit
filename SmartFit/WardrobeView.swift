@@ -3,6 +3,7 @@ import PhotosUI
 
 struct WardrobeView: View {
     @StateObject private var controller = WardrobeController()
+    @State private var showAddOptions = false
 
     var body: some View {
         NavigationView {
@@ -29,13 +30,15 @@ struct WardrobeView: View {
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(controller.selectedCategory == category
-                                        ? Color.blue
-                                        : Color.gray.opacity(0.2)
+                                    .background(
+                                        controller.selectedCategory == category
+                                            ? Color.blue
+                                            : Color.gray.opacity(0.2)
                                     )
-                                    .foregroundColor(controller.selectedCategory == category
-                                        ? .white
-                                        : .black
+                                    .foregroundColor(
+                                        controller.selectedCategory == category
+                                            ? .white
+                                            : .black
                                     )
                                     .cornerRadius(20)
                                 }
@@ -52,7 +55,7 @@ struct WardrobeView: View {
                                     .font(.headline)
                                     .padding()
                                 Button("Add Item") {
-                                    controller.showAddSheet = true
+                                    showAddOptions = true
                                 }
                                 .padding()
                                 .background(Color.blue)
@@ -62,7 +65,10 @@ struct WardrobeView: View {
                             .frame(maxHeight: .infinity)
                         } else {
                             ScrollView {
-                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                LazyVGrid(
+                                    columns: [GridItem(.flexible()), GridItem(.flexible())],
+                                    spacing: 16
+                                ) {
                                     ForEach(controller.filteredItems) { item in
                                         ItemCard(item: item, controller: controller)
                                     }
@@ -71,7 +77,6 @@ struct WardrobeView: View {
                                 .padding(.bottom, 70)
                             }
                         }
-
                             // Outfit selector bar at bottom
                             VStack(spacing: 0) {
                                 Divider()
@@ -103,6 +108,102 @@ struct WardrobeView: View {
                         .padding(.bottom, 60)
                     }
                 }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                ZStack(alignment: .bottomTrailing) {
+                    // Background overlay when menu is open
+                    if showAddOptions {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.3)) {
+                                    showAddOptions = false
+                                }
+                            }
+                    }
+                    
+                    VStack(alignment: .trailing, spacing: 16) {
+                        // Menu items (shown when expanded)
+                        if showAddOptions {
+                            // Manual Entry button
+                            HStack(spacing: 12) {
+                                Text("Manual Entry")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.white)
+                                    .cornerRadius(8)
+                                    .shadow(radius: 4)
+                                
+                                Button {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showAddOptions = false
+                                    }
+                                    controller.showAddSheet = true
+                                } label: {
+                                    Image(systemName: "square.and.pencil")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 48, height: 48)
+                                        .background(Color.blue)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 4)
+                                }
+                            }
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                            
+                            // Import from URL button
+                            HStack(spacing: 12) {
+                                Text("Import from URL")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.white)
+                                    .cornerRadius(8)
+                                    .shadow(radius: 4)
+                                
+                                Button {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showAddOptions = false
+                                    }
+                                    controller.showUrlImportSheet = true
+                                } label: {
+                                    Image(systemName: "link")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 48, height: 48)
+                                        .background(Color.cyan)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 4)
+                                }
+                            }
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                        }
+                        
+                        // Main "+" button
+                        Button {
+                            withAnimation(.spring(response: 0.3)) {
+                                showAddOptions.toggle()
+                            }
+                        } label: {
+                            Image(systemName: showAddOptions ? "xmark" : "plus")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(showAddOptions ? Color.red : Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                                .rotationEffect(.degrees(showAddOptions ? 45 : 0))
+                        }
+                    }
+                    .padding(20)
+                }
+            }
+            // URL import sheet
+            .sheet(isPresented: $controller.showUrlImportSheet) {
+                UrlImportSheet(controller: controller)
             }
             .navigationTitle("Wardrobe")
             // Displays Add item to wardrobe sheet (POST Request)
@@ -274,10 +375,10 @@ struct ItemCard: View {
             }
         }
         .padding(8)
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
-        // .border(Color.gray)
-        // .cornerRadius(5)
-        // .shadow(radius: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray, lineWidth: 2)
+        )
         .onTapGesture {
             controller.equipItem(itemId: item.id, category: item.category)
         }
@@ -292,7 +393,8 @@ struct AddItemSheet: View {
         NavigationView {
             Form {
                 Section(header: Text("Photo *")) {
-                    if let imageData = controller.formImageData, let uiImage = UIImage(data: imageData) {
+                    if let imageData = controller.formImageData,
+                       let uiImage = UIImage(data: imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFit()
@@ -373,9 +475,11 @@ struct AddItemSheet: View {
                     Button("Add") {
                         controller.submitAddItem()
                     }
-                    .disabled(controller.formName.isEmpty ||
-                             controller.formColor.isEmpty ||
-                             controller.formIsLoading)
+                    .disabled(
+                        controller.formName.isEmpty ||
+                        controller.formColor.isEmpty ||
+                        controller.formIsLoading
+                    )
                 }
             }
             .onChange(of: controller.formSelectedImage) { _, newValue in

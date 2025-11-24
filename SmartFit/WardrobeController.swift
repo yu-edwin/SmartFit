@@ -31,6 +31,13 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
     @Published var formIsLoading = false
     @Published var formErrorMessage: String?
 
+    // added
+    @Published var showUrlImportSheet = false
+    @Published var urlToImport = ""
+    @Published var urlImportSize = "M"
+    @Published var isImportingUrl = false
+    @Published var urlImportError: String?
+
     // NEW FIELDS
     @Published var formColor = ""
     @Published var formSize = "M"
@@ -296,6 +303,7 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
         infoItem = item
         showInfoSheet = true
     }
+
     // Helper to turn a data URL like "data:image/jpeg;base64,..." into Data
     private func imageData(fromDataURL dataURL: String) -> Data? {
         // Split at the first comma: "data:image/jpeg;base64," | "<base64...>"
@@ -380,6 +388,37 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
             print("Seeded starter wardrobe for this user")
         } catch {
             print("Failed to seed starter wardrobe: \(error)")
+        }
+    }
+
+    func importFromUrl() {
+        guard !urlToImport.isEmpty else {
+            urlImportError = "Please enter a URL"
+            return
+        }
+
+        isImportingUrl = true
+        urlImportError = nil
+
+        Task {
+            do {
+                try await model.importFromUrl(
+                    productUrl: urlToImport,
+                    size: urlImportSize
+                )
+
+                await MainActor.run {
+                    self.urlToImport = ""
+                    self.urlImportSize = "M"
+                    self.showUrlImportSheet = false
+                    self.isImportingUrl = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.urlImportError = error.localizedDescription
+                    self.isImportingUrl = false
+                }
+            }
         }
     }
 }
