@@ -111,6 +111,9 @@ struct PhotoFormView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Generate") {
+                        print("=== Generate button tapped ===")
+                        print("Selected outfit: \(selectedOutfit)")
+                        print("Equipped items count: \(equippedItems.count)")
                         Task {
                             await generateOutfit()
                         }
@@ -160,22 +163,35 @@ struct PhotoFormView: View {
     }
 
     private func generateOutfit() async {
+        print("=== generateOutfit() called ===")
         isGenerating = true
         errorMessage = nil
+        print("isGenerating set to true")
 
         do {
+            print("About to call wardrobeController.model.generateOutfit")
+            print("Outfit number: \(selectedOutfit)")
+            print("Image size: \(image.size)")
+
             let result = try await wardrobeController.model.generateOutfit(
                 outfitNumber: selectedOutfit,
                 picture: image
             )
+
+            print("=== API call returned successfully ===")
+            print("Result length: \(result.count)")
             generatedImage = result
             print("Successfully generated outfit image")
         } catch {
+            print("=== ERROR in generateOutfit ===")
+            print("Error: \(error)")
+            print("Error localized description: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
             print("Failed to generate outfit: \(error)")
         }
 
         isGenerating = false
+        print("isGenerating set to false")
     }
 }
 
