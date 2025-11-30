@@ -32,6 +32,8 @@ struct CameraView: View {
             VStack {
                 Spacer()
                 HStack {
+                    Spacer()
+
                     // Photo library button
                     PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                         Image(systemName: "photo.on.rectangle")
@@ -40,7 +42,6 @@ struct CameraView: View {
                             .padding()
                             .background(Circle().fill(Color.white.opacity(0.3)))
                     }
-                    .padding(.leading, 30)
                     .accessibilityIdentifier("photoLibraryButton")
 
                     Spacer()
@@ -54,7 +55,6 @@ struct CameraView: View {
                             .background(Circle().fill(Color.white.opacity(0.3)))
                             .frame(width: 70, height: 70)
                     }
-                    .padding(.trailing, 30)
                     .accessibilityIdentifier("capturePhotoButton")
 
                     Spacer()
@@ -68,8 +68,9 @@ struct CameraView: View {
                             .foregroundColor(.white)
                             .padding()
                     }
-                    .padding(.trailing, 30)
                     .accessibilityIdentifier("rotateCameraButton")
+
+                    Spacer()
                 }
                 .padding(.bottom, 30)
             }
