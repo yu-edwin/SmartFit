@@ -71,6 +71,7 @@ class WardrobeModel: ObservableObject {
         }
     }
 
+    // Main call for POST request wardrobeItem (clothingItem)
     // swiftlint:disable:next function_parameter_count
     func addItem(
         name: String,
@@ -391,4 +392,37 @@ class WardrobeModel: ObservableObject {
         
         try await fetchItems()
     }
+    // MARK: Delete Request
+    // Main call for DELETE request wardrobeItem (clothingItem)
+    func deleteItem(itemId: String) async throws {
+        // 1. Build URL: /api/wardrobe/:id
+        guard let url = URL(string: "\(baseURL)/\(itemId)") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+
+        // 2. Send request
+        let (_, response) = try await urlSession.data(for: request)
+
+        // 3. Validate response
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to delete item"]
+            )
+        }
+
+        // 4. Update local state so UI refreshes
+        await MainActor.run {
+            self.items.removeAll { $0.id == itemId }
+        }
+    }
+
 }

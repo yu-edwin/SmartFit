@@ -344,6 +344,22 @@ struct ItemCard: View {
                     }
 
                     HStack {
+                        Button {
+                            // You can wire this up however your controller works
+                            controller.deleteItem(item)
+                            // Or, if delete is async:
+                            // Task {
+                            //     await controller.deleteItem(item)
+                            // }
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.caption)
+                                .padding(6)
+                                .background(Color.red.opacity(0.1))
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+
                         Spacer()
                         if let price = item.price, price > 0 {
                             Text("$\(String(format: "%.2f", price))")

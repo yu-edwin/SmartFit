@@ -452,4 +452,16 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
             }
         }
     }
+    func deleteItem(_ item: WardrobeItem) {
+        Task {
+            do {
+                try await model.deleteItem(itemId: item.id)
+                // If filteredItems depends on wardrobeModel.items,
+                // it will update via your existing logic.
+            } catch {
+                print("Failed to delete item: \(error)")
+                // Optional: set an @Published errorMessage to show an alert
+            }
+        }
+    }
 }
