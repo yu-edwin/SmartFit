@@ -217,6 +217,8 @@ struct ItemCard: View {
     let item: WardrobeItem
     @ObservedObject var controller: WardrobeController
 
+    private let cardHeight: CGFloat = 240
+    private let imageHeight: CGFloat = 160
     var isEquipped: Bool {
         controller.currentEquippedOutfit[item.category] == item.id
     }
@@ -230,15 +232,16 @@ struct ItemCard: View {
                    let uiImage = UIImage(data: data) {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .aspectRatio(1, contentMode: .fill)
-                        .frame(maxWidth: .infinity, minHeight: 160, maxHeight: 160)
+                        .scaledToFill()                    // fill the space
+                        .frame(height: imageHeight)        // fixed height
+                        .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(10)
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(height: 160)
-                        .aspectRatio(1, contentMode: .fill)
+                        .frame(height: imageHeight)        // same fixed height
+                        .frame(maxWidth: .infinity)
                         .cornerRadius(8)
                         .overlay(
                             Image(systemName: "tshirt")
@@ -260,7 +263,7 @@ struct ItemCard: View {
                 }
             }
             .overlay(alignment: .topTrailing) {
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     // Info button (top)
                     Button {
                         controller.showInfo(for: item)
@@ -288,7 +291,7 @@ struct ItemCard: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(8)
+                .padding(4)
             }
 
             ZStack(alignment: .bottomTrailing) {
@@ -312,14 +315,13 @@ struct ItemCard: View {
                                 .foregroundColor(.black)
                         }
                     }
-
+                    Spacer(minLength: 0)   // 🔑 pushes the next HStack to the bottom
                     HStack {
                         Button {
                             controller.deleteItem(item)
                         } label: {
                             Image(systemName: "trash")
                                 .font(.caption)
-                                .padding(6)
                                 .background(Color.red.opacity(0.1))
                                 .clipShape(Circle())
                         }
@@ -340,7 +342,9 @@ struct ItemCard: View {
                 }
             }
         }
-        .padding(8)
+        .padding(6)
+        .frame(maxWidth: .infinity)
+        .frame(height: cardHeight, alignment: .top) 
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 2)
