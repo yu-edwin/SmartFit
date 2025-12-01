@@ -94,13 +94,20 @@ struct ItemInfoSheet: View {
 
     @ViewBuilder
     private func infoRow(label: String, value: String?) -> some View {
-        if let value, !value.isEmpty {
-            HStack {
-                Text(label)
-                    .fontWeight(.semibold)
-                Spacer()
-                Text(value)
-            }
+        HStack {
+            Text(label)
+                .fontWeight(.semibold)
+            Spacer()
+            Text(displayValue(from: value))
+                .foregroundColor(
+                    (value?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
+                    ? .primary
+                    : .secondary
+                )
         }
+    }
+    private func displayValue(from value: String?) -> String {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? "------" : trimmed
     }
 }
