@@ -89,9 +89,7 @@ export const deleteClothingItem = async (req, res) => {
                 .status(400)
                 .json({ message: "Clothing item is not found given the Id" });
         }
-        print("Deleted!");
         res.status(200).json({ success: true });
-        print("Deleted Success!");
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
