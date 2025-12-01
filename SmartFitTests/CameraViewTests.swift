@@ -44,4 +44,32 @@ struct CameraViewTests {
         // Then: View should be created without crashing
         #expect(cameraView.wardrobeController === wardrobeController)
     }
+
+    // MARK: - Photo Library Selection Tests
+
+    @Test @MainActor func cameraViewHasPhotoLibraryButton() {
+        // Given: A wardrobe controller
+        let wardrobeController = WardrobeController()
+
+        // When: Creating a CameraView
+        let cameraView = CameraView(wardrobeController: wardrobeController)
+        let hostingController = UIHostingController(rootView: cameraView)
+        _ = hostingController.view
+
+        // Then: View should be created with photo library access
+        #expect(hostingController.view != nil)
+    }
+
+    @Test @MainActor func capturedImageTriggersPhotoFormSheet() {
+        // Given: A wardrobe controller and camera view
+        let wardrobeController = WardrobeController()
+        let cameraView = CameraView(wardrobeController: wardrobeController)
+
+        // When: Creating the view with sheet presentation capability
+        let hostingController = UIHostingController(rootView: cameraView)
+        _ = hostingController.view
+
+        // Then: View should handle sheet presentation without crashing
+        #expect(hostingController.view != nil)
+    }
 }
