@@ -7,6 +7,13 @@ struct UrlImportSheet: View {
     var body: some View {
         NavigationView {
             Form {
+                if let error = controller.urlImportError {
+                    Section {
+                        Text("Please try a different link")
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
                 Section(header: Text("Product URL")) {
                     TextField("Paste URL here", text: $controller.urlToImport)
                         .autocapitalization(.none)
@@ -20,14 +27,6 @@ struct UrlImportSheet: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                }
-                
-                if let error = controller.urlImportError {
-                    Section {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
                 }
             }
             .navigationTitle("Import from URL")
