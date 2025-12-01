@@ -48,6 +48,7 @@ class WardrobeModel: ObservableObject {
         return user.idToken
     }
 
+    // MARK: GET Request
     func fetchItems() async throws {
         guard let userId = getCurrentUserId() else {
             throw NSError(domain: "User not logged in", code: -1)
@@ -71,7 +72,7 @@ class WardrobeModel: ObservableObject {
         }
     }
 
-    // Main call for POST request wardrobeItem (clothingItem)
+    // MARK: POST Request
     // swiftlint:disable:next function_parameter_count
     func addItem(
         name: String,
@@ -140,7 +141,7 @@ class WardrobeModel: ObservableObject {
         try await fetchItems()
     }
 
-    // Main call for PUT request wardrobeItem (clothingItem)
+    // MARK: PUT Request
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     func updateItem(
         itemId: String,
@@ -410,7 +411,7 @@ class WardrobeModel: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NSError(domain: "Invalid response", code: -1)
         }
-
+        print(httpResponse)
         guard (200..<300).contains(httpResponse.statusCode) else {
             throw NSError(
                 domain: "Server Error",
@@ -424,5 +425,4 @@ class WardrobeModel: ObservableObject {
             self.items.removeAll { $0.id == itemId }
         }
     }
-
 }

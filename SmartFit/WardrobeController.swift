@@ -65,7 +65,7 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
 
     let categories = ["all", "tops", "bottoms", "shoes", "outerwear", "accessories"]
     let formCategories = ["tops", "bottoms", "shoes", "outerwear", "accessories"]
-    let sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "Custom"]
+    let sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "Other"]
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -452,6 +452,8 @@ class WardrobeController: ObservableObject { // swiftlint:disable:this type_body
             }
         }
     }
+
+    // Calls deleteItem from wardrobeModel
     func deleteItem(_ item: WardrobeItem) {
         Task {
             do {

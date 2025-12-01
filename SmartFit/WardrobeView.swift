@@ -303,7 +303,7 @@ struct ItemCard: View {
 
                     HStack {
                         if let brand = item.brand, !brand.isEmpty {
-                            Text("\(brand.uppercased()) •")
+                            Text("\(brand.uppercased())")
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         } else {
@@ -311,46 +311,11 @@ struct ItemCard: View {
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         }
-                        if let size = item.size, !size.isEmpty {
-                            Text("Size: \(size.uppercased())")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Size: --")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        }
-                    }
-
-                    HStack {
-                        if let color = item.color, !color.isEmpty {
-                            Text("\(color.capitalized) •")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Color: -- •")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        }
-                        if let material = item.material, !material.isEmpty {
-                            Text("\(material.capitalized)")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Material: --")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        }
                     }
 
                     HStack {
                         Button {
-                            // You can wire this up however your controller works
                             controller.deleteItem(item)
-                            // Or, if delete is async:
-                            // Task {
-                            //     await controller.deleteItem(item)
-                            // }
                         } label: {
                             Image(systemName: "trash")
                                 .font(.caption)
@@ -359,7 +324,6 @@ struct ItemCard: View {
                                 .clipShape(Circle())
                         }
                         .buttonStyle(.plain)
-
                         Spacer()
                         if let price = item.price, price > 0 {
                             Text("$\(String(format: "%.2f", price))")
@@ -383,114 +347,6 @@ struct ItemCard: View {
         )
         .onTapGesture {
             controller.equipItem(itemId: item.id, category: item.category)
-        }
-    }
-}
-
-struct AddItemSheet: View {
-    @SwiftUI.Environment(\.dismiss) var dismiss
-    @ObservedObject var controller: WardrobeController
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Photo *")) {
-                    if let imageData = controller.formImageData,
-                       let uiImage = UIImage(data: imageData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxHeight: 200)
-                            .cornerRadius(8)
-                    }
-                    PhotosPicker(selection: $controller.formSelectedImage, matching: .images) {
-                        Label("Select Photo", systemImage: "photo")
-                    }
-                }
-
-                Section(header: Text("Basic Information")) {
-                    TextField("Name *", text: $controller.formName)
-                        .autocapitalization(.words)
-
-                    Picker("Category *", selection: $controller.formCategory) {
-                        ForEach(controller.formCategories, id: \.self) { cat in
-                            Text(cat.capitalized)
-                        }
-                    }
-
-                    TextField("Brand (optional)", text: $controller.formBrand)
-                        .autocapitalization(.words)
-                    TextField("Color *", text: $controller.formColor)
-                        .autocapitalization(.words)
-                }
-
-                Section(header: Text("Size")) {
-                    Picker("Size *", selection: $controller.formSize) {
-                        ForEach(controller.sizeOptions, id: \.self) { size in
-                            Text(size).tag(size)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                Section(header: Text("Price (Optional)")) {
-                    HStack {
-                        Text("$")
-                            .foregroundColor(.secondary)
-                        TextField("0.00", text: $controller.formPrice)
-                            .keyboardType(.decimalPad)
-                    }
-                }
-
-                Section(header: Text("Additional Information (Optional)")) {
-                    TextField("Product URL", text: $controller.formItemUrl)
-                        .autocapitalization(.none)
-                        .keyboardType(.URL)
-                    TextField("Material", text: $controller.formMaterial)
-                        .autocapitalization(.words)
-                }
-
-                if let errorMessage = controller.formErrorMessage {
-                    Section {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
-                }
-
-                Section {
-                    Text("* Required fields")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-            }
-            .navigationTitle("Add Item")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        controller.resetForm()
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        controller.submitAddItem()
-                    }
-                    .disabled(
-                        controller.formName.isEmpty ||
-                        controller.formColor.isEmpty ||
-                        controller.formIsLoading
-                    )
-                }
-            }
-            .onChange(of: controller.formSelectedImage) { _, newValue in
-                Task {
-                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                        controller.formImageData = data
-                    }
-                }
-            }
         }
     }
 }
