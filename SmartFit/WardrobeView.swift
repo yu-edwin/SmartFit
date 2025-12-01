@@ -232,15 +232,15 @@ struct ItemCard: View {
                    let uiImage = UIImage(data: data) {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .scaledToFill()                    // fill the space
-                        .frame(height: imageHeight)        // fixed height
+                        .scaledToFill()
+                        .frame(height: imageHeight)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(10)
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(height: imageHeight)        // same fixed height
+                        .frame(height: imageHeight)
                         .frame(maxWidth: .infinity)
                         .cornerRadius(8)
                         .overlay(
@@ -315,7 +315,7 @@ struct ItemCard: View {
                                 .foregroundColor(.black)
                         }
                     }
-                    Spacer(minLength: 0)   // 🔑 pushes the next HStack to the bottom
+                    Spacer(minLength: 0)
                     HStack {
                         Button {
                             controller.deleteItem(item)
