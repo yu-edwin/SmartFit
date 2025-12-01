@@ -3,7 +3,7 @@ import SwiftUI
 struct UrlImportSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var controller: WardrobeController
-    
+
     var body: some View {
         NavigationView {
             Form {
@@ -19,7 +19,7 @@ struct UrlImportSheet: View {
                         .autocapitalization(.none)
                         .keyboardType(.URL)
                 }
-                
+
                 Section(header: Text("Size")) {
                     Picker("Size", selection: $controller.urlImportSize) {
                         ForEach(controller.sizeOptions, id: \.self) { size in
@@ -33,10 +33,10 @@ struct UrlImportSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { 
+                    Button("Cancel") {
                         controller.urlToImport = ""
                         controller.urlImportError = nil
-                        dismiss() 
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {

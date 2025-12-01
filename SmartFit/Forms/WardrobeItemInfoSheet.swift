@@ -8,7 +8,6 @@ struct ItemInfoSheet: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-
                     // Image on top
                     if let imageString = item.image_data,
                        let base64 = imageString.components(separatedBy: ",").last,

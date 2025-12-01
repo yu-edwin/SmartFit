@@ -106,7 +106,6 @@ struct WardrobeView: View {
                                 }
                             }
                     }
-                    
                     VStack(alignment: .trailing, spacing: 16) {
                         // Menu items (shown when expanded)
                         if showAddOptions {
@@ -120,7 +119,6 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
-                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -137,7 +135,6 @@ struct WardrobeView: View {
                                 }
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
-                            
                             // Import from URL button
                             HStack(spacing: 12) {
                                 Text("Import from URL")
@@ -148,7 +145,6 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
-                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -166,7 +162,6 @@ struct WardrobeView: View {
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
-                        
                         // Main "+" button
                         Button {
                             withAnimation(.spring(response: 0.3)) {
@@ -344,7 +339,7 @@ struct ItemCard: View {
         }
         .padding(6)
         .frame(maxWidth: .infinity)
-        .frame(height: cardHeight, alignment: .top) 
+        .frame(height: cardHeight, alignment: .top)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 2)
