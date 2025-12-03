@@ -5,6 +5,10 @@ struct WardrobeView: View {
     @ObservedObject var controller: WardrobeController
     @State private var showAddOptions = false
 
+    private let gridColumns = [
+        GridItem(.flexible(), spacing: 6),
+        GridItem(.flexible(), spacing: 6)
+    ]
     var body: some View {
         NavigationView {
             ZStack {
@@ -65,16 +69,12 @@ struct WardrobeView: View {
                             .frame(maxHeight: .infinity)
                         } else {
                             ScrollView {
-                                LazyVGrid(
-                                    columns: [GridItem(.flexible()), GridItem(.flexible())],
-                                    spacing: 16
-                                ) {
+                                LazyVGrid(columns: gridColumns, spacing: 16) {  // 16 = vertical gap
                                     ForEach(controller.filteredItems) { item in
                                         ItemCard(item: item, controller: controller)
                                     }
                                 }
-                                .padding()
-                                .padding(.bottom, 70)
+                                .padding(.horizontal, 8)  // side padding, optional
                             }
                         }
                             // Outfit selector bar at bottom
@@ -211,13 +211,9 @@ struct WardrobeView: View {
 struct ItemCard: View {
     let item: WardrobeItem
     @ObservedObject var controller: WardrobeController
-
-    private let cardHeight: CGFloat = 240
-    private let imageHeight: CGFloat = 160
     var isEquipped: Bool {
         controller.currentEquippedOutfit[item.category] == item.id
     }
-
     var body: some View {
         VStack {
             ZStack(alignment: .bottomTrailing) {
@@ -227,16 +223,15 @@ struct ItemCard: View {
                    let uiImage = UIImage(data: data) {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .scaledToFill()
-                        .frame(height: imageHeight)
-                        .frame(maxWidth: .infinity)
+                        .aspectRatio(1, contentMode: .fill)
+                        .frame(maxWidth: .infinity, minHeight: 160, maxHeight: 160)
                         .clipped()
                         .cornerRadius(10)
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(height: imageHeight)
-                        .frame(maxWidth: .infinity)
+                        .frame(height: 160)
+                        .aspectRatio(1, contentMode: .fill)
                         .cornerRadius(8)
                         .overlay(
                             Image(systemName: "tshirt")
@@ -244,7 +239,6 @@ struct ItemCard: View {
                                 .foregroundColor(.gray)
                         )
                 }
-
                 if isEquipped {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 32))
@@ -258,7 +252,7 @@ struct ItemCard: View {
                 }
             }
             .overlay(alignment: .topTrailing) {
-                VStack(spacing: 4) {
+                VStack(spacing: 8) {
                     // Info button (top)
                     Button {
                         controller.showInfo(for: item)
@@ -272,7 +266,6 @@ struct ItemCard: View {
                             .shadow(radius: 2)
                     }
                     .buttonStyle(.plain)
-
                     // Edit button (below)
                     Button {
                         controller.startEditing(item)
@@ -286,9 +279,8 @@ struct ItemCard: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(4)
+                .padding(8)
             }
-
             ZStack(alignment: .bottomTrailing) {
                 VStack(alignment: .center) {
                     HStack {
@@ -298,29 +290,29 @@ struct ItemCard: View {
                             .fontWeight(.bold)
                             .lineLimit(1)
                     }
-
                     HStack {
                         if let brand = item.brand, !brand.isEmpty {
                             Text("\(brand.uppercased())")
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         } else {
-                            Text("Brand: --- •")
+                            Text("Brand: ---")
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         }
                     }
-                    Spacer(minLength: 0)
                     HStack {
                         Button {
                             controller.deleteItem(item)
                         } label: {
                             Image(systemName: "trash")
                                 .font(.caption)
+                                .padding(6)
                                 .background(Color.red.opacity(0.1))
                                 .clipShape(Circle())
                         }
                         .buttonStyle(.plain)
+
                         Spacer()
                         if let price = item.price, price > 0 {
                             Text("$\(String(format: "%.2f", price))")
@@ -337,9 +329,7 @@ struct ItemCard: View {
                 }
             }
         }
-        .padding(6)
-        .frame(maxWidth: .infinity)
-        .frame(height: cardHeight, alignment: .top)
+        .padding(8)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 2)
