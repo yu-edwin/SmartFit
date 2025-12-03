@@ -31,9 +31,10 @@ class CameraViewController: UIViewController {
             captureSession.removeInput(currentInput)
         }
 
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera,
-                                                   for: .video,
-                                                   position: currentCameraPosition),
+        guard let device = AVCaptureDevice.default(
+            .builtInWideAngleCamera,
+            for: .video,
+            position: currentCameraPosition),
               let newInput = try? AVCaptureDeviceInput(device: device),
               captureSession.canAddInput(newInput) else {
             captureSession.commitConfiguration()
@@ -45,7 +46,7 @@ class CameraViewController: UIViewController {
 
         captureSession.commitConfiguration()
     }
-    
+
     func capturePhoto() {
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
@@ -76,7 +77,7 @@ class CameraViewController: UIViewController {
             self?.captureSession.startRunning()
         }
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -92,7 +93,7 @@ class CameraViewController: UIViewController {
             self?.captureSession.stopRunning()
         }
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
@@ -112,4 +113,3 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         }
     }
 }
-

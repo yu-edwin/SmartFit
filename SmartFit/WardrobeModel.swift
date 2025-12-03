@@ -7,20 +7,16 @@ struct WardrobeItem: Identifiable, Codable {
     let category: String
     let name: String
     let brand: String?
-    // swiftlint:disable:next identifier_name
     let image_data: String?
     let price: Double?
     let color: String?
     let size: String?
     let material: String?
-    // swiftlint:disable:next identifier_name
     let item_url: String?
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
-        // swiftlint:disable:next identifier_name
         case userId, category, name, brand, image_data, price
-        // swiftlint:disable:next identifier_name
         case color, size, material, item_url
     }
 }
@@ -48,6 +44,7 @@ class WardrobeModel: ObservableObject {
         return user.idToken
     }
 
+    // MARK: GET Request
     func fetchItems() async throws {
         guard let userId = getCurrentUserId() else {
             throw NSError(domain: "User not logged in", code: -1)
@@ -71,7 +68,7 @@ class WardrobeModel: ObservableObject {
         }
     }
 
-    // swiftlint:disable:next function_parameter_count
+    // MARK: POST Request
     func addItem(
         name: String,
         category: String,
@@ -139,8 +136,7 @@ class WardrobeModel: ObservableObject {
         try await fetchItems()
     }
 
-    // Main call for PUT request wardrobeItem (clothingItem)
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // MARK: PUT Request
     func updateItem(
         itemId: String,
         name: String? = nil,
@@ -278,22 +274,22 @@ class WardrobeModel: ObservableObject {
     func generateOutfit(outfitNumber: Int, picture: UIImage) async throws -> String {
         print("=== WardrobeModel.generateOutfit called ===")
         print("Outfit number: \(outfitNumber)")
-        
+
         guard let userId = getCurrentUserId() else {
             print("ERROR: User not logged in")
             throw NSError(domain: "User not logged in", code: -1)
         }
         print("User ID: \(userId)")
-        
+
         let userBaseURL = "https://smartfit-development.onrender.com/api/user"
         let urlString = "\(userBaseURL)/\(userId)/generate-outfit/\(outfitNumber)"
         print("URL: \(urlString)")
-        
+
         guard let url = URL(string: urlString) else {
             print("ERROR: Invalid URL")
             throw NSError(domain: "Invalid URL", code: -1)
         }
-        
+
         // Convert UIImage to base64 data URL
         print("Converting image to base64...")
         guard let imageData = picture.jpegData(compressionQuality: 0.8) else {
@@ -303,29 +299,29 @@ class WardrobeModel: ObservableObject {
         print("Image data size: \(imageData.count) bytes")
         let base64Picture = "data:image/jpeg;base64," + imageData.base64EncodedString()
         print("Base64 string length: \(base64Picture.count)")
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         let body: [String: Any] = [
             "picture": base64Picture
         ]
-        
+
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         print("Request body size: \(request.httpBody?.count ?? 0) bytes")
         print("Sending POST request to backend...")
-        
+
         let (data, response) = try await urlSession.data(for: request)
         print("=== Received response from backend ===")
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             print("ERROR: Invalid response type")
             throw NSError(domain: "Invalid response", code: -1)
         }
-        
+
         print("HTTP Status Code: \(httpResponse.statusCode)")
-        
+
         guard (200..<300).contains(httpResponse.statusCode) else {
             print("ERROR: Server returned error status code")
             if let responseString = String(data: data, encoding: .utf8) {
@@ -337,7 +333,7 @@ class WardrobeModel: ObservableObject {
                 userInfo: [NSLocalizedDescriptionKey: "Failed to generate outfit"]
             )
         }
-        
+
         // Parse response to get generated image
         print("Parsing response JSON...")
         if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
@@ -363,32 +359,61 @@ class WardrobeModel: ObservableObject {
         guard let userId = getCurrentUserId() else {
             throw NSError(domain: "User not logged in", code: -1)
         }
-        
+
         guard let url = URL(string: "\(baseURL)/import-url") else {
             throw NSError(domain: "Invalid URL", code: -1)
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         let body: [String: Any] = [
             "userId": userId,
             "productUrl": productUrl,
             "size": size.uppercased()
         ]
-        
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
         let (_, response) = try await urlSession.data(for: request)
-        
+
         if let httpResponse = response as? HTTPURLResponse {
             print("Import response: \(httpResponse.statusCode)")
             if httpResponse.statusCode != 201 && httpResponse.statusCode != 200 {
                 throw NSError(domain: "Import failed", code: httpResponse.statusCode)
             }
         }
-        
         try await fetchItems()
+    }
+    // MARK: Delete Request
+    // Main call for DELETE request wardrobeItem (clothingItem)
+    func deleteItem(itemId: String) async throws {
+        // 1. Build URL: /api/wardrobe/:id
+        guard let url = URL(string: "\(baseURL)/\(itemId)") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+
+        // 2. Send request
+        let (_, response) = try await urlSession.data(for: request)
+
+        // 3. Validate response
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "Invalid response", code: -1)
+        }
+        print(httpResponse)
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw NSError(
+                domain: "Server Error",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to delete item"]
+            )
+        }
+
+        // 4. Update local state so UI refreshes
+        await MainActor.run {
+            self.items.removeAll { $0.id == itemId }
+        }
     }
 }
