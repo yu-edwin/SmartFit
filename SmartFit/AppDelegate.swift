@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Photos
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,6 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = UIHostingController(rootView: contentView)
         self.window = window
         window.makeKeyAndVisible()
+
+        // Seed sample photos on first launch
+        seedSamplePhotosOnFirstLaunch()
+
         return true
     }
 
@@ -59,5 +64,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Restart any tasks that were paused (or not yet started) while the application was inactive.
         If the application was previously in the background, optionally refresh the user interface.
         */
+    }
+
+    // MARK: - Photo Gallery Seeding
+
+    private func seedSamplePhotosOnFirstLaunch() {
+        let hasSeededKey = "hasSeededGalleryPhotos"
+
+        // Check if already seeded
+        guard !UserDefaults.standard.bool(forKey: hasSeededKey) else {
+            return
+        }
+
+        // List of sample image names from Assets.xcassets
+        let sampleImageNames = ["person", "person2", "person3", "crocs", "ripped_jeans", "scarf", "sunglasses", "tshirt"]
+
+        // Request permission and save photos
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            guard status == .authorized || status == .limited else {
+                print("Photo library permission denied")
+                return
+            }
+
+            // Save each sample image to photo library
+            for imageName in sampleImageNames {
+                if let image = UIImage(named: imageName) {
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetChangeRequest.creationRequestForAsset(from: image)
+                    }) { success, error in
+                        if success {
+                            print("Saved \(imageName) to photo library")
+                        } else if let error = error {
+                            print("Error saving \(imageName): \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+
+            // Mark as seeded
+            UserDefaults.standard.set(true, forKey: hasSeededKey)
+        }
     }
 }
