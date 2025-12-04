@@ -38,9 +38,9 @@ struct CameraView: View {
                     PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                         Image(systemName: "photo.on.rectangle")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
                             .padding()
-                            .background(Circle().fill(Color.white.opacity(0.3)))
+                            .background(Circle().fill(Color.white))
                     }
                     .accessibilityIdentifier("photoLibraryButton")
 
