@@ -8,6 +8,7 @@ struct ItemInfoSheet: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+
                     // Image on top
                     if let imageString = item.image_data,
                        let base64 = imageString.components(separatedBy: ",").last,
@@ -93,20 +94,13 @@ struct ItemInfoSheet: View {
 
     @ViewBuilder
     private func infoRow(label: String, value: String?) -> some View {
-        HStack {
-            Text(label)
-                .fontWeight(.semibold)
-            Spacer()
-            Text(displayValue(from: value))
-                .foregroundColor(
-                    (value?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
-                    ? .primary
-                    : .secondary
-                )
+        if let value, !value.isEmpty {
+            HStack {
+                Text(label)
+                    .fontWeight(.semibold)
+                Spacer()
+                Text(value)
+            }
         }
-    }
-    private func displayValue(from value: String?) -> String {
-        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? "------" : trimmed
     }
 }

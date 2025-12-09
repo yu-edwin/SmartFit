@@ -69,11 +69,6 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 - brew install swiftlint (Install brew first if not already)
 - swiftlint lint --quiet
 
-### Application view
-
-![Image of SmartFit Wardrobe](assets/PRD/SmartFitImage.png)
-[Video Demo]()
-
 ### Links
 
 **Burn Chart**

@@ -8,13 +8,6 @@ struct UpdateItemSheet: View {
     var body: some View {
         NavigationView {
             Form {
-                if let errorMessage = controller.formErrorMessage {
-                    Section {
-                        Text("Could not update items with info provided. Please try again.")
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
-                }
                 // Update Image section
                 Section(header: Text("Photo")) {
                     if let data = controller.editImageData,

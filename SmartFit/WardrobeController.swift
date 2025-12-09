@@ -3,7 +3,7 @@ import PhotosUI
 import SwiftUI
 import Combine
 
-class WardrobeController: ObservableObject {
+class WardrobeController: ObservableObject { // swiftlint:disable:this type_body_length
     @Published var model = WardrobeModel()
     @Published var selectedCategory = "all"
     @Published var selectedOutfit = 1 {
@@ -65,7 +65,7 @@ class WardrobeController: ObservableObject {
 
     let categories = ["all", "tops", "bottoms", "shoes", "outerwear", "accessories"]
     let formCategories = ["tops", "bottoms", "shoes", "outerwear", "accessories"]
-    let sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "Other"]
+    let sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "Custom"]
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -211,6 +211,7 @@ class WardrobeController: ObservableObject {
             // Update local state
             outfits = updatedOutfits
             saveOutfits()
+            // TODO: Add backend call for unequipping when backend supports it
         } else {
             updatedOutfits[selectedOutfit]?[category] = itemId
             print("Equipping item \(itemId) to outfit \(selectedOutfit)")
@@ -255,6 +256,7 @@ class WardrobeController: ObservableObject {
     }
 
     // PUT clothingItem request. Ensures quality in updated info and calls request
+    // swiftlint:disable:next function_body_length
     func submitEdit() {
         guard let item = editingItem else { return }
 
@@ -342,6 +344,7 @@ class WardrobeController: ObservableObject {
     }
 
     // Seeds data into newly registered account
+    // swiftlint:disable:next function_body_length
     private func seedStarterWardrobeIfNeeded() async {
         do {
             if !model.items.isEmpty {
@@ -446,20 +449,6 @@ class WardrobeController: ObservableObject {
                     self.urlImportError = error.localizedDescription
                     self.isImportingUrl = false
                 }
-            }
-        }
-    }
-
-    // Calls deleteItem from wardrobeModel
-    func deleteItem(_ item: WardrobeItem) {
-        Task {
-            do {
-                try await model.deleteItem(itemId: item.id)
-                // If filteredItems depends on wardrobeModel.items,
-                // it will update via your existing logic.
-            } catch {
-                print("Failed to delete item: \(error)")
-                // Optional: set an @Published errorMessage to show an alert
             }
         }
     }

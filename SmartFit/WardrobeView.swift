@@ -5,10 +5,6 @@ struct WardrobeView: View {
     @ObservedObject var controller: WardrobeController
     @State private var showAddOptions = false
 
-    private let gridColumns = [
-        GridItem(.flexible(), spacing: 6),
-        GridItem(.flexible(), spacing: 6)
-    ]
     var body: some View {
         NavigationView {
             ZStack {
@@ -69,12 +65,16 @@ struct WardrobeView: View {
                             .frame(maxHeight: .infinity)
                         } else {
                             ScrollView {
-                                LazyVGrid(columns: gridColumns, spacing: 16) {  // 16 = vertical gap
+                                LazyVGrid(
+                                    columns: [GridItem(.flexible()), GridItem(.flexible())],
+                                    spacing: 16
+                                ) {
                                     ForEach(controller.filteredItems) { item in
                                         ItemCard(item: item, controller: controller)
                                     }
                                 }
-                                .padding(.horizontal, 8)  // side padding, optional
+                                .padding()
+                                .padding(.bottom, 70)
                             }
                         }
                             // Outfit selector bar at bottom
@@ -106,6 +106,7 @@ struct WardrobeView: View {
                                 }
                             }
                     }
+                    
                     VStack(alignment: .trailing, spacing: 16) {
                         // Menu items (shown when expanded)
                         if showAddOptions {
@@ -119,6 +120,7 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
+                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -135,6 +137,7 @@ struct WardrobeView: View {
                                 }
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
+                            
                             // Import from URL button
                             HStack(spacing: 12) {
                                 Text("Import from URL")
@@ -145,6 +148,7 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
+                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -162,6 +166,7 @@ struct WardrobeView: View {
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
+                        
                         // Main "+" button
                         Button {
                             withAnimation(.spring(response: 0.3)) {
@@ -211,9 +216,11 @@ struct WardrobeView: View {
 struct ItemCard: View {
     let item: WardrobeItem
     @ObservedObject var controller: WardrobeController
+
     var isEquipped: Bool {
         controller.currentEquippedOutfit[item.category] == item.id
     }
+
     var body: some View {
         VStack {
             ZStack(alignment: .bottomTrailing) {
@@ -239,6 +246,7 @@ struct ItemCard: View {
                                 .foregroundColor(.gray)
                         )
                 }
+
                 if isEquipped {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 32))
@@ -266,6 +274,7 @@ struct ItemCard: View {
                             .shadow(radius: 2)
                     }
                     .buttonStyle(.plain)
+
                     // Edit button (below)
                     Button {
                         controller.startEditing(item)
@@ -281,6 +290,7 @@ struct ItemCard: View {
                 }
                 .padding(8)
             }
+
             ZStack(alignment: .bottomTrailing) {
                 VStack(alignment: .center) {
                     HStack {
@@ -290,29 +300,50 @@ struct ItemCard: View {
                             .fontWeight(.bold)
                             .lineLimit(1)
                     }
+
                     HStack {
                         if let brand = item.brand, !brand.isEmpty {
-                            Text("\(brand.uppercased())")
+                            Text("\(brand.uppercased()) •")
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         } else {
-                            Text("Brand: ---")
+                            Text("Brand: --- •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                        if let size = item.size, !size.isEmpty {
+                            Text("Size: \(size.uppercased())")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Size: --")
                                 .font(.caption2)
                                 .foregroundColor(.black)
                         }
                     }
-                    HStack {
-                        Button {
-                            controller.deleteItem(item)
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.caption)
-                                .padding(6)
-                                .background(Color.red.opacity(0.1))
-                                .clipShape(Circle())
-                        }
-                        .buttonStyle(.plain)
 
+                    HStack {
+                        if let color = item.color, !color.isEmpty {
+                            Text("\(color.capitalized) •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Color: -- •")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                        if let material = item.material, !material.isEmpty {
+                            Text("\(material.capitalized)")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Material: --")
+                                .font(.caption2)
+                                .foregroundColor(.black)
+                        }
+                    }
+
+                    HStack {
                         Spacer()
                         if let price = item.price, price > 0 {
                             Text("$\(String(format: "%.2f", price))")
@@ -336,6 +367,114 @@ struct ItemCard: View {
         )
         .onTapGesture {
             controller.equipItem(itemId: item.id, category: item.category)
+        }
+    }
+}
+
+struct AddItemSheet: View {
+    @SwiftUI.Environment(\.dismiss) var dismiss
+    @ObservedObject var controller: WardrobeController
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Photo *")) {
+                    if let imageData = controller.formImageData,
+                       let uiImage = UIImage(data: imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 200)
+                            .cornerRadius(8)
+                    }
+                    PhotosPicker(selection: $controller.formSelectedImage, matching: .images) {
+                        Label("Select Photo", systemImage: "photo")
+                    }
+                }
+
+                Section(header: Text("Basic Information")) {
+                    TextField("Name *", text: $controller.formName)
+                        .autocapitalization(.words)
+
+                    Picker("Category *", selection: $controller.formCategory) {
+                        ForEach(controller.formCategories, id: \.self) { cat in
+                            Text(cat.capitalized)
+                        }
+                    }
+
+                    TextField("Brand (optional)", text: $controller.formBrand)
+                        .autocapitalization(.words)
+                    TextField("Color *", text: $controller.formColor)
+                        .autocapitalization(.words)
+                }
+
+                Section(header: Text("Size")) {
+                    Picker("Size *", selection: $controller.formSize) {
+                        ForEach(controller.sizeOptions, id: \.self) { size in
+                            Text(size).tag(size)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section(header: Text("Price (Optional)")) {
+                    HStack {
+                        Text("$")
+                            .foregroundColor(.secondary)
+                        TextField("0.00", text: $controller.formPrice)
+                            .keyboardType(.decimalPad)
+                    }
+                }
+
+                Section(header: Text("Additional Information (Optional)")) {
+                    TextField("Product URL", text: $controller.formItemUrl)
+                        .autocapitalization(.none)
+                        .keyboardType(.URL)
+                    TextField("Material", text: $controller.formMaterial)
+                        .autocapitalization(.words)
+                }
+
+                if let errorMessage = controller.formErrorMessage {
+                    Section {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
+
+                Section {
+                    Text("* Required fields")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            }
+            .navigationTitle("Add Item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        controller.resetForm()
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        controller.submitAddItem()
+                    }
+                    .disabled(
+                        controller.formName.isEmpty ||
+                        controller.formColor.isEmpty ||
+                        controller.formIsLoading
+                    )
+                }
+            }
+            .onChange(of: controller.formSelectedImage) { _, newValue in
+                Task {
+                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                        controller.formImageData = data
+                    }
+                }
+            }
         }
     }
 }

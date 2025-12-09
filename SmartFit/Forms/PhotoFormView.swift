@@ -18,7 +18,7 @@ struct PhotoFormView: View {
 
     var equippedItems: [WardrobeItem] {
         guard let outfit = wardrobeController.outfits[selectedOutfit] else { return [] }
-        return outfit.compactMap { _, itemId in
+        return outfit.compactMap { category, itemId in
             wardrobeController.model.items.first { $0.id == itemId }
         }
     }
