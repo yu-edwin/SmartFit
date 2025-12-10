@@ -27,7 +27,7 @@ struct CameraView: View {
                     capturedImage = IdentifiableImage(image: image)
                 }
             )
-            .ignoresSafeArea()
+            .ignoresSafeArea(edges: .top)
 
             VStack {
                 Spacer()
@@ -72,7 +72,7 @@ struct CameraView: View {
 
                     Spacer()
                 }
-                .padding(.bottom, 30)
+                .padding(.bottom, 20)
             }
         }
         .sheet(item: $capturedImage) { identifiableImage in
