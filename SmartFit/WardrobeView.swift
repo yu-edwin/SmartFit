@@ -37,7 +37,7 @@ struct WardrobeView: View {
                                     .background(
                                         controller.selectedCategory == category
                                             ? Color.blue
-                                            : Color.gray.opacity(0.2)
+                                            : Color.gray.opacity(0.8)
                                     )
                                     .foregroundColor(
                                         controller.selectedCategory == category
@@ -245,7 +245,7 @@ struct ItemCard: View {
                         .foregroundColor(.green)
                         .background(
                             Circle()
-                                .fill(Color.white)
+                                .fill(Color(UIColor.systemBackground))
                                 .frame(width: 40, height: 40)
                         )
                         .padding(8)
@@ -261,7 +261,7 @@ struct ItemCard: View {
                         Image(systemName: "info.circle")
                             .font(.system(size: 14, weight: .bold))
                             .padding(6)
-                            .background(Color.white.opacity(0.9))
+                            .background(Color(UIColor.systemBackground).opacity(0.9))
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
@@ -273,7 +273,7 @@ struct ItemCard: View {
                         Image(systemName: "pencil")
                             .font(.system(size: 14, weight: .bold))
                             .padding(6)
-                            .background(Color.white.opacity(0.9))
+                            .background(Color(UIColor.systemBackground).opacity(0.9))
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
@@ -286,7 +286,7 @@ struct ItemCard: View {
                     HStack {
                         Text(item.name)
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .fontWeight(.bold)
                             .lineLimit(1)
                     }
@@ -294,11 +294,11 @@ struct ItemCard: View {
                         if let brand = item.brand, !brand.isEmpty {
                             Text("\(brand.uppercased())")
                                 .font(.caption2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.secondary)
                         } else {
                             Text("Brand: ---")
                                 .font(.caption2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.secondary)
                         }
                     }
                     HStack {
@@ -330,6 +330,7 @@ struct ItemCard: View {
             }
         }
         .padding(8)
+        .background(Color(UIColor.secondarySystemBackground))   // <– card background
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 2)
