@@ -75,9 +75,12 @@ jobs:
             -scheme SmartFit \
             -project SmartFit.xcodeproj \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -only-testing:SmartFitTests \
             -resultBundlePath TestResults \
+            -test-timeouts-enabled YES \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
+        timeout-minutes: 15
 
       - name: Upload test results
         if: always()
