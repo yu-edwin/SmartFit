@@ -581,8 +581,14 @@ describe("User API", () => {
             expect(generateOutfitImageGemini3).toHaveBeenCalledWith(
                 validPicture,
                 [
-                    { image: "data:image/jpeg;base64,shirt123", category: "tops" },
-                    { image: "data:image/jpeg;base64,jeans456", category: "bottoms" },
+                    {
+                        image: "data:image/jpeg;base64,shirt123",
+                        category: "tops",
+                    },
+                    {
+                        image: "data:image/jpeg;base64,jeans456",
+                        category: "bottoms",
+                    },
                 ]
             );
         });
@@ -726,7 +732,9 @@ describe("User API", () => {
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImageGemini3.mockResolvedValue("data:image/png;base64,mock");
+            generateOutfitImageGemini3.mockResolvedValue(
+                "data:image/png;base64,mock"
+            );
 
             const res2 = await request(app)
                 .post(`/api/user/${validUserId}/generate-outfit/2`)
