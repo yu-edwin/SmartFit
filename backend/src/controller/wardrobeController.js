@@ -4,7 +4,6 @@ import {
 } from "../services/productScraperService.js";
 import mongoose from "mongoose";
 import Wardrobeitem from "../models/clothingSchema.js";
-import { analyzeClothingImage } from "../services/geminiService.js";
 
 // GET request: Get all items in wardrobe
 export const getAllItems = async (req, res) => {
@@ -36,7 +35,6 @@ export const createClothingItem = async (req, res) => {
             name,
             price,
             brand,
-            description,
             image_data,
             color,
             size,
@@ -50,18 +48,12 @@ export const createClothingItem = async (req, res) => {
                 .json({ message: "User id not valid. Try again" });
         }
 
-        // Calling on gemini service
-        if (image_data) {
-            description = await analyzeClothingImage(image_data);
-        }
-
         const newItem = await Wardrobeitem.create({
             userId,
             category,
             name,
             price,
             brand,
-            description,
             image_data,
             color,
             size,
@@ -141,12 +133,6 @@ export const importFromUrl = async (req, res) => {
 
         const scrapedData = await scrapeProductInfo(productUrl);
 
-        let description;
-        // Calling on gemini service
-        if (scrapedData.image_data) {
-            description = await analyzeClothingImage(scrapedData.image_data);
-        }
-
         const newItem = await Wardrobeitem.create({
             userId,
             name: scrapedData.name,
@@ -158,7 +144,6 @@ export const importFromUrl = async (req, res) => {
             material: scrapedData.material || "",
             item_url: productUrl,
             image_data: scrapedData.image_data,
-            description: description,
         });
 
         res.status(201).json({
