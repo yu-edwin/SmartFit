@@ -18,10 +18,15 @@ struct AuthView: View {
 
     var body: some View {
         VStack(spacing: 20) {
+            Image("SmartFitLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 120, height: 120)
+                .padding(.top, 40)
             Text("SmartFit")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-                .padding(.top, 50)
+                .padding(.top, 10)
 
             Spacer()
 
