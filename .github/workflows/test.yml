@@ -64,7 +64,7 @@ jobs:
       - name: Run iOS Tests
         run: |
           xcodebuild test \
-            -scheme SmartFitTests \
+            -scheme SmartFit \
             -project SmartFit.xcodeproj \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -resultBundlePath TestResults \
