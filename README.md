@@ -74,12 +74,49 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 ![Image of SmartFit Wardrobe](assets/PRD/SmartFitImage.png)
 [Video Demo]()
 
+### Setup Instructions
+
+1. Clone repository onto xCode
+2. Click on smartfit on the top of right bar (not the folder but above it)
+3. Click on SmartFit under "Targets" and open "Signing and Capabilities" to sign with your apple ID
+4. If not already set, set the bundle identifier to "edwin.SmartFit"
+5. On the very top bar of Xcode, select which device you want to run.
+- If paired with physical iphone device, please connect it via cord
+6. Product -> Clean Build Folder (Shift + Command + K) 
+7. Manually press the right arrow, or Product -> Run (Command + R)
+
+**Testing Instructions**
+- Backend
+1. Clone repository to local device
+2. cd into backend
+3. Run command 'npm ci', then 'npm test'
+
+- Frontend
+**Please use xCode for easier testing**
+1. Clone repository to xCode
+2. Product -> Clean Build Folder (Shift + Command + K) 
+3. Open 'Test Navigator' (Icon on right in horizontal bar with a check mark in a square)
+4. Press run on any test
+
+**Linting Instructions**
+- Backend 
+1. Clone repository to local device
+2. cd into backend
+3. Run command 'npm ci', then 'npm run lint'
+
+-Frontend
+1. Clone repository to local device
+2. cd into SmartFit
+3. brew install swiftlint
+4. run command 'swiftlint lint --quiet --config .swiftlint.yml'
+
 ### Links
 
 **Burn Chart**
-[Burn Chart Sprint 1] (https://github.com/users/yu-edwin/projects/1/insights/2?period=3M)
-[Burn Chart Sprint 2] (https://github.com/users/yu-edwin/projects/1/insights/4)
+[Burn Chart Sprint 1] (https://github.com/users/yu-edwin/projects/1/insights/2)
+[Burn Chart Sprint 2] (https://github.com/users/yu-edwin/projects/1/insights/4?period=3M)
 [Burn Chart Sprint 3] (https://github.com/users/yu-edwin/projects/1/insights/3)
+[Burn Chart Sprint 4] (https://github.com/users/yu-edwin/projects/1/insights/5?period=1M)
 
 **CI/CD Pipeline**
 [View CI Workflow](https://github.com/yu-edwin/SmartFit/actions)

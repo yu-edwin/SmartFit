@@ -13,19 +13,48 @@ struct WardrobeView: View {
         NavigationView {
             ZStack {
                 if controller.isLoading {
-                    // Loading screen
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        Text("Loading your wardrobe...")
-                            .font(.headline)
-                            .foregroundColor(.gray)
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Image("SmartFitLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Text("Wardrobe")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        Spacer()
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                            Text("Loading your wardrobe...")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ZStack(alignment: .bottomTrailing) {
                         VStack(spacing: 0) {
+                                HStack(spacing: 12) {
+                                    Image("SmartFitLogo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    Text("Wardrobe")
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.top, 8)
                             ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(controller.categories, id: \.self) { category in
@@ -49,7 +78,6 @@ struct WardrobeView: View {
                             }
                             .padding()
                         }
-
                         if controller.filteredItems.isEmpty {
                             VStack {
                                 Image(systemName: "hanger")
@@ -69,12 +97,12 @@ struct WardrobeView: View {
                             .frame(maxHeight: .infinity)
                         } else {
                             ScrollView {
-                                LazyVGrid(columns: gridColumns, spacing: 16) {  // 16 = vertical gap
+                                LazyVGrid(columns: gridColumns, spacing: 16) {
                                     ForEach(controller.filteredItems) { item in
                                         ItemCard(item: item, controller: controller)
                                     }
                                 }
-                                .padding(.horizontal, 8)  // side padding, optional
+                                .padding(.horizontal, 8)
                             }
                         }
                             // Outfit selector bar at bottom
@@ -186,7 +214,6 @@ struct WardrobeView: View {
             .sheet(isPresented: $controller.showUrlImportSheet) {
                 UrlImportSheet(controller: controller)
             }
-            .navigationTitle("Wardrobe")
             // Displays Add item to wardrobe sheet (POST Request)
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
