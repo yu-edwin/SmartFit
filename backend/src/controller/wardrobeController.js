@@ -73,7 +73,7 @@ export const createClothingItem = async (req, res) => {
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({
-            message: `POST REQUEST wardrobeItem FAILED!! \n ${err}`,
+            message: `Unable to edit clothing item. Please check data entry and try again. \n ${err}`,
         });
     }
 };
@@ -118,7 +118,7 @@ export const updateClothingItem = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
-            message: `Failed to update clothing item... HERE IS ERROR: ${err}`,
+            message: `Failed to update clothing item. Please try again`,
         });
     }
 };
@@ -168,7 +168,7 @@ export const importFromUrl = async (req, res) => {
     } catch (error) {
         console.error("Import error:", error);
         res.status(500).json({
-            message: `Import failed: ${error.message}`,
+            message: `Unable to process URL. Please use a new link`,
         });
     }
 };
