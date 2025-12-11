@@ -71,6 +71,7 @@ jobs:
 
       - name: Run iOS Tests
         run: |
+          set -euo pipefail
           xcodebuild test \
             -scheme SmartFit \
             -project SmartFit.xcodeproj \
