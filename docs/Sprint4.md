@@ -30,7 +30,7 @@
 - Organization of some code on frontend (swift) for readablity 
 - Clear assignment of tasks and no conflicts in merging.
 - Group meetings discussing progress and deployment
-- New development branch that was worked on and merged with main after sprint 2.
+- Continuous merge into development from local branch of an issue. Merged development into main after the end of sprint.
 - Better code review from peers
 **Improvements for Future**
 - More comments on confusing aspects of code
@@ -40,7 +40,7 @@
 
 **Ticket Quality Improvement**
 - Esimation can be off.
-- Each ticket with a task should have a test case ticket that follows.
+- Each ticket with a task should have a test case ticket that follows if creating/updating functions.
 
 **Future improvement of application**
 - Integrate social media aspect
@@ -80,7 +80,7 @@
 - 3 Different types of branch were used
 1. Main Branch (Merge Development -> Main only after completion of sprint 4)
 2. Development Branch (Merge Local branch -> Development after a ticket is complete)
-3. Local Branch (Branch for a specific task/ticket on the backlog)
+3. Local Branch (Branch for a specific issue/task/ticket on the backlog)
 **Branch Protection Rules**
 1. Main only accepts branches with passing CI and peer reviewed PR
 [Screenshot] (TODO)
@@ -146,7 +146,9 @@
 - Duration: 30 Min
 
 1. Gemini 3 potential integration
-2. Testflight deployment
+2. Testflight deployment (public and private deployment)
+3. Discussed burn chart trends and how to improve them.
+4. Blocked on issue #103 - Fix Swift Unit Testing CI/CD on github since some tests are failing and difficulty in setting up tests outside of xcode. 
 
 - **Date: Dec 10, 2025**
 - Attendees: Justin Dong, Daiki Koike, Edwin Yu
@@ -196,7 +198,16 @@
 3. Product owner feedback
 4. Merge conflicts (minor) and confusing swift unit testing
 5. Faster completion of CI/CD pipeline and unit testing
+
 ## Section 8: Working MVP Deliverable (10 points)
+
+**Acceptance Criteria Met for Sprint 4**
+1. Acceptance Criteria: Wardrobe UI looks polished for ALL apple mobile devices
+2. Acceptance Criteria: Error in adding items to wardrobe, generating image, editing clothing item card, and login now displays proper error messages for the user
+3. Acceptance Criteria: Camera tab UI looks more polished such that the navigation bar on the bottom is visible when user is on the camera tab.
+4. Acceptance Criteria: UI for wardrobe tab looks polished when in both light mode and dark mode. User is able to make out all information visually in both settings.
+5. Acceptance Criteria: Users are able to press the delete button of a clothing item card and it will delete it from their virtual wardrobe along with deleting that clothing item info in the database.
+
 **Appetize**
 [SmartFit Application] (https://appetize.io/app/b_dvvsesm4bgqbi6olyut4cno4w4)
 **Testflight**
