@@ -16,7 +16,7 @@ struct WardrobeLoadingScreenTests {
 
     @Test func loadingScreenShowsWhenFetchingItems() async throws {
         // Given: Setup mock URL and successful response
-        let wardrobeURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/wardrobe?userId=mock-user-id-123")!
+        let wardrobeURL = URL(string: "https://smartfit-development.onrender.com/api/wardrobe?userId=mock-user-id-123")!
         MockURLProtocol.mockWardrobeFetchSuccess(url: wardrobeURL)
 
         // Setup mock user in UserDefaults
@@ -53,7 +53,7 @@ struct WardrobeLoadingScreenTests {
 
     @Test func loadingScreenHidesAfterSuccessfulFetch() async throws {
         // Given: Setup mock URL and successful response
-        let wardrobeURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/wardrobe?userId=mock-user-id-123")!
+        let wardrobeURL = URL(string: "https://smartfit-development.onrender.com/api/wardrobe?userId=mock-user-id-123")!
         MockURLProtocol.mockWardrobeFetchSuccess(url: wardrobeURL)
 
         // Setup mock user in UserDefaults

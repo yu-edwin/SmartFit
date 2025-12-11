@@ -16,7 +16,7 @@ struct AuthenticationControllerTests {
 
     @Test func loginSuccessfullyAuthenticatesUser() async throws {
         // Given: Setup mock URL and response
-        let loginURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/login")!
+        let loginURL = URL(string: "https://smartfit-development.onrender.com/api/user/login")!
         MockURLProtocol.mockLoginSuccess(url: loginURL)
 
         let config = URLSessionConfiguration.ephemeral
@@ -45,7 +45,7 @@ struct AuthenticationControllerTests {
 
     @Test func loginPersistsUserIDToStorage() async throws {
         // Given: Setup mock URL and response
-        let loginURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/login")!
+        let loginURL = URL(string: "https://smartfit-development.onrender.com/api/user/login")!
         MockURLProtocol.mockLoginSuccess(url: loginURL)
 
         let config = URLSessionConfiguration.ephemeral
@@ -81,7 +81,7 @@ struct AuthenticationControllerTests {
 
     @Test func loginWithInvalidCredentialsFails() async throws {
         // Given: Setup mock URL and failure response
-        let loginURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/login")!
+        let loginURL = URL(string: "https://smartfit-development.onrender.com/api/user/login")!
         MockURLProtocol.mockLoginFailure(url: loginURL)
 
         let config = URLSessionConfiguration.ephemeral
@@ -111,7 +111,7 @@ struct AuthenticationControllerTests {
 
     @Test func registerCreatesNewUser() async throws {
         // Given: Setup mock URL for register
-        let registerURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/register")!
+        let registerURL = URL(string: "https://smartfit-development.onrender.com/api/user/register")!
         MockURLProtocol.mockRegisterSuccess(url: registerURL)
 
         let config = URLSessionConfiguration.ephemeral
@@ -142,7 +142,7 @@ struct AuthenticationControllerTests {
 
     @Test func registerPersistsUserIDToStorage() async throws {
         // Given: Setup mock URL for register
-        let registerURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/register")!
+        let registerURL = URL(string: "https://smartfit-development.onrender.com/api/user/register")!
         MockURLProtocol.mockRegisterSuccess(url: registerURL)
 
         let config = URLSessionConfiguration.ephemeral
@@ -178,7 +178,7 @@ struct AuthenticationControllerTests {
 
     @Test func registerWithExistingEmailFails() async throws {
         // Given: Setup mock URL with failure response
-        let registerURL = URL(string: "https://smartfit-backend-lhz4.onrender.com/api/user/register")!
+        let registerURL = URL(string: "https://smartfit-development.onrender.com/api/user/register")!
         MockURLProtocol.mockRegisterFailure(url: registerURL)
 
         let config = URLSessionConfiguration.ephemeral
