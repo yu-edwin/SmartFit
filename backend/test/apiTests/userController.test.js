@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "../../server.js";
 import User from "../../src/models/userSchema.js";
 import ClothingItem from "../../src/models/clothingSchema.js";
-import { generateOutfitImage } from "../../src/services/geminiService.js";
+import { generateOutfitImageGemini3 } from "../../src/services/geminiService.js";
 
 // Mock mongoose
 jest.mock("mongoose", () => ({
@@ -551,18 +551,20 @@ describe("User API", () => {
                 {
                     _id: validItemId1,
                     name: "Blue Shirt",
-                    description: "A nice blue shirt",
+                    category: "tops",
+                    image_data: "data:image/jpeg;base64,shirt123",
                 },
                 {
                     _id: validItemId2,
                     name: "Black Jeans",
-                    description: "Dark black jeans",
+                    category: "bottoms",
+                    image_data: "data:image/jpeg;base64,jeans456",
                 },
             ];
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImage.mockResolvedValue(
+            generateOutfitImageGemini3.mockResolvedValue(
                 "data:image/png;base64,mockGeneratedImage"
             );
 
@@ -576,9 +578,12 @@ describe("User API", () => {
                 "Outfit generated successfully"
             );
             expect(res.body).toHaveProperty("generatedImage");
-            expect(generateOutfitImage).toHaveBeenCalledWith(
-                "A nice blue shirt Dark black jeans ",
-                validPicture
+            expect(generateOutfitImageGemini3).toHaveBeenCalledWith(
+                validPicture,
+                [
+                    { image: "data:image/jpeg;base64,shirt123", category: "tops" },
+                    { image: "data:image/jpeg;base64,jeans456", category: "bottoms" },
+                ]
             );
         });
 
@@ -666,7 +671,7 @@ describe("User API", () => {
             expect(res.body).toHaveProperty("message", "Outfit is empty");
         });
 
-        test("handles items without descriptions", async () => {
+        test("generates outfit with clothing items", async () => {
             mongoose.Types.ObjectId.isValid.mockReturnValue(true);
 
             const mockUser = {
@@ -680,13 +685,14 @@ describe("User API", () => {
                 {
                     _id: validItemId1,
                     name: "Blue Shirt",
-                    description: null, // No description
+                    category: "tops",
+                    image_data: "data:image/jpeg;base64,shirt123",
                 },
             ];
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImage.mockResolvedValue(
+            generateOutfitImageGemini3.mockResolvedValue(
                 "data:image/png;base64,mockGeneratedImage"
             );
 
@@ -695,8 +701,10 @@ describe("User API", () => {
                 .send({ picture: validPicture });
 
             expect(res.statusCode).toBe(200);
-            // Prompt should be empty string since no descriptions
-            expect(generateOutfitImage).toHaveBeenCalledWith("", validPicture);
+            expect(generateOutfitImageGemini3).toHaveBeenCalledWith(
+                validPicture,
+                [{ image: "data:image/jpeg;base64,shirt123", category: "tops" }]
+            );
         });
 
         test("works with outfit2 and outfit3", async () => {
@@ -709,12 +717,16 @@ describe("User API", () => {
             };
 
             const mockClothingItems = [
-                { _id: validItemId1, description: "Item 1" },
+                {
+                    _id: validItemId1,
+                    category: "tops",
+                    image_data: "data:image/jpeg;base64,item1",
+                },
             ];
 
             User.findById.mockResolvedValue(mockUser);
             ClothingItem.find.mockResolvedValue(mockClothingItems);
-            generateOutfitImage.mockResolvedValue("data:image/png;base64,mock");
+            generateOutfitImageGemini3.mockResolvedValue("data:image/png;base64,mock");
 
             const res2 = await request(app)
                 .post(`/api/user/${validUserId}/generate-outfit/2`)
