@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct IdentifiableImage: Identifiable {
     let id = UUID()
@@ -16,6 +17,7 @@ struct CameraView: View {
     @ObservedObject var wardrobeController: WardrobeController
     @State private var controller: CameraViewController?
     @State private var capturedImage: IdentifiableImage?
+    @State private var selectedPhotoItem: PhotosPickerItem?
 
     var body: some View {
         ZStack {
@@ -25,11 +27,23 @@ struct CameraView: View {
                     capturedImage = IdentifiableImage(image: image)
                 }
             )
-            .ignoresSafeArea()
+            .ignoresSafeArea(edges: .top)
 
             VStack {
                 Spacer()
                 HStack {
+                    Spacer()
+
+                    // Photo library button
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Circle().fill(Color.white.opacity(0.3)))
+                    }
+                    .accessibilityIdentifier("photoLibraryButton")
+
                     Spacer()
 
                     // Capture button
@@ -41,7 +55,6 @@ struct CameraView: View {
                             .background(Circle().fill(Color.white.opacity(0.3)))
                             .frame(width: 70, height: 70)
                     }
-                    .padding(.trailing, 30)
                     .accessibilityIdentifier("capturePhotoButton")
 
                     Spacer()
@@ -55,10 +68,11 @@ struct CameraView: View {
                             .foregroundColor(.white)
                             .padding()
                     }
-                    .padding(.trailing, 30)
                     .accessibilityIdentifier("rotateCameraButton")
+
+                    Spacer()
                 }
-                .padding(.bottom, 30)
+                .padding(.bottom, 20)
             }
         }
         .sheet(item: $capturedImage) { identifiableImage in
@@ -70,6 +84,16 @@ struct CameraView: View {
                 ),
                 wardrobeController: wardrobeController
             )
+        }
+        .onChange(of: selectedPhotoItem) {
+            Task {
+                if let selectedPhotoItem = selectedPhotoItem,
+                   let data = try? await selectedPhotoItem.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    capturedImage = IdentifiableImage(image: uiImage)
+                }
+                selectedPhotoItem = nil
+            }
         }
     }
 }

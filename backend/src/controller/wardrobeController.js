@@ -4,7 +4,6 @@ import {
 } from "../services/productScraperService.js";
 import mongoose from "mongoose";
 import Wardrobeitem from "../models/clothingSchema.js";
-import { analyzeClothingImage } from "../services/geminiService.js";
 
 // GET request: Get all items in wardrobe
 export const getAllItems = async (req, res) => {
@@ -36,7 +35,6 @@ export const createClothingItem = async (req, res) => {
             name,
             price,
             brand,
-            description,
             image_data,
             color,
             size,
@@ -50,18 +48,12 @@ export const createClothingItem = async (req, res) => {
                 .json({ message: "User id not valid. Try again" });
         }
 
-        // Calling on gemini service
-        if (image_data) {
-            description = await analyzeClothingImage(image_data);
-        }
-
         const newItem = await Wardrobeitem.create({
             userId,
             category,
             name,
             price,
             brand,
-            description,
             image_data,
             color,
             size,
@@ -73,7 +65,7 @@ export const createClothingItem = async (req, res) => {
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({
-            message: `POST REQUEST wardrobeItem FAILED!! \n ${err}`,
+            message: `Unable to edit clothing item. Please check data entry and try again. \n ${err}`,
         });
     }
 };
@@ -118,7 +110,7 @@ export const updateClothingItem = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({
-            message: `Failed to update clothing item... HERE IS ERROR: ${err}`,
+            message: `Failed to update clothing item. Please try again`,
         });
     }
 };
@@ -141,12 +133,6 @@ export const importFromUrl = async (req, res) => {
 
         const scrapedData = await scrapeProductInfo(productUrl);
 
-        let description;
-        // Calling on gemini service
-        if (scrapedData.image_data) {
-            description = await analyzeClothingImage(scrapedData.image_data);
-        }
-
         const newItem = await Wardrobeitem.create({
             userId,
             name: scrapedData.name,
@@ -158,7 +144,6 @@ export const importFromUrl = async (req, res) => {
             material: scrapedData.material || "",
             item_url: productUrl,
             image_data: scrapedData.image_data,
-            description: description,
         });
 
         res.status(201).json({
@@ -168,7 +153,7 @@ export const importFromUrl = async (req, res) => {
     } catch (error) {
         console.error("Import error:", error);
         res.status(500).json({
-            message: `Import failed: ${error.message}`,
+            message: `Unable to process URL. Please use a new link`,
         });
     }
 };

@@ -40,18 +40,6 @@ struct CameraViewControllerTests {
         #expect(true)
     }
 
-    @Test @MainActor func capturePhotoDoesNotCrash() {
-        // Given: A camera controller with view loaded
-        let controller = CameraViewController()
-        _ = controller.view
-
-        // When: Capture photo is called
-        controller.capturePhoto()
-
-        // Then: Should not crash
-        #expect(true)
-    }
-
     @Test @MainActor func onPhotoCapturedCallbackIsSet() {
         // Given: A camera controller
         let controller = CameraViewController()

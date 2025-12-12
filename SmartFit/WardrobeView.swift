@@ -5,23 +5,56 @@ struct WardrobeView: View {
     @ObservedObject var controller: WardrobeController
     @State private var showAddOptions = false
 
+    private let gridColumns = [
+        GridItem(.flexible(), spacing: 6),
+        GridItem(.flexible(), spacing: 6)
+    ]
     var body: some View {
         NavigationView {
             ZStack {
                 if controller.isLoading {
-                    // Loading screen
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(CircularProgressViewStyle(tint: .blue))
-                        Text("Loading your wardrobe...")
-                            .font(.headline)
-                            .foregroundColor(.gray)
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Image("SmartFitLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Text("Wardrobe")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        Spacer()
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                            Text("Loading your wardrobe...")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ZStack(alignment: .bottomTrailing) {
                         VStack(spacing: 0) {
+                                HStack(spacing: 12) {
+                                    Image("SmartFitLogo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    Text("Wardrobe")
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.top, 8)
                             ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 ForEach(controller.categories, id: \.self) { category in
@@ -33,7 +66,7 @@ struct WardrobeView: View {
                                     .background(
                                         controller.selectedCategory == category
                                             ? Color.blue
-                                            : Color.gray.opacity(0.2)
+                                            : Color.gray.opacity(0.8)
                                     )
                                     .foregroundColor(
                                         controller.selectedCategory == category
@@ -45,7 +78,6 @@ struct WardrobeView: View {
                             }
                             .padding()
                         }
-
                         if controller.filteredItems.isEmpty {
                             VStack {
                                 Image(systemName: "hanger")
@@ -65,16 +97,12 @@ struct WardrobeView: View {
                             .frame(maxHeight: .infinity)
                         } else {
                             ScrollView {
-                                LazyVGrid(
-                                    columns: [GridItem(.flexible()), GridItem(.flexible())],
-                                    spacing: 16
-                                ) {
+                                LazyVGrid(columns: gridColumns, spacing: 16) {
                                     ForEach(controller.filteredItems) { item in
                                         ItemCard(item: item, controller: controller)
                                     }
                                 }
-                                .padding()
-                                .padding(.bottom, 70)
+                                .padding(.horizontal, 8)
                             }
                         }
                             // Outfit selector bar at bottom
@@ -106,7 +134,6 @@ struct WardrobeView: View {
                                 }
                             }
                     }
-                    
                     VStack(alignment: .trailing, spacing: 16) {
                         // Menu items (shown when expanded)
                         if showAddOptions {
@@ -120,7 +147,6 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
-                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -137,7 +163,6 @@ struct WardrobeView: View {
                                 }
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
-                            
                             // Import from URL button
                             HStack(spacing: 12) {
                                 Text("Import from URL")
@@ -148,7 +173,6 @@ struct WardrobeView: View {
                                     .background(Color.white)
                                     .cornerRadius(8)
                                     .shadow(radius: 4)
-                                
                                 Button {
                                     withAnimation(.spring(response: 0.3)) {
                                         showAddOptions = false
@@ -166,7 +190,6 @@ struct WardrobeView: View {
                             }
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
-                        
                         // Main "+" button
                         Button {
                             withAnimation(.spring(response: 0.3)) {
@@ -191,7 +214,6 @@ struct WardrobeView: View {
             .sheet(isPresented: $controller.showUrlImportSheet) {
                 UrlImportSheet(controller: controller)
             }
-            .navigationTitle("Wardrobe")
             // Displays Add item to wardrobe sheet (POST Request)
             .sheet(isPresented: $controller.showAddSheet) {
                 AddItemSheet(controller: controller)
@@ -216,11 +238,9 @@ struct WardrobeView: View {
 struct ItemCard: View {
     let item: WardrobeItem
     @ObservedObject var controller: WardrobeController
-
     var isEquipped: Bool {
         controller.currentEquippedOutfit[item.category] == item.id
     }
-
     var body: some View {
         VStack {
             ZStack(alignment: .bottomTrailing) {
@@ -246,14 +266,13 @@ struct ItemCard: View {
                                 .foregroundColor(.gray)
                         )
                 }
-
                 if isEquipped {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 32))
                         .foregroundColor(.green)
                         .background(
                             Circle()
-                                .fill(Color.white)
+                                .fill(Color(UIColor.systemBackground))
                                 .frame(width: 40, height: 40)
                         )
                         .padding(8)
@@ -269,12 +288,11 @@ struct ItemCard: View {
                         Image(systemName: "info.circle")
                             .font(.system(size: 14, weight: .bold))
                             .padding(6)
-                            .background(Color.white.opacity(0.9))
+                            .background(Color(UIColor.systemBackground).opacity(0.9))
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
                     .buttonStyle(.plain)
-
                     // Edit button (below)
                     Button {
                         controller.startEditing(item)
@@ -282,7 +300,7 @@ struct ItemCard: View {
                         Image(systemName: "pencil")
                             .font(.system(size: 14, weight: .bold))
                             .padding(6)
-                            .background(Color.white.opacity(0.9))
+                            .background(Color(UIColor.systemBackground).opacity(0.9))
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
@@ -290,60 +308,38 @@ struct ItemCard: View {
                 }
                 .padding(8)
             }
-
             ZStack(alignment: .bottomTrailing) {
                 VStack(alignment: .center) {
                     HStack {
                         Text(item.name)
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .fontWeight(.bold)
                             .lineLimit(1)
                     }
-
                     HStack {
                         if let brand = item.brand, !brand.isEmpty {
-                            Text("\(brand.uppercased()) •")
+                            Text("\(brand.uppercased())")
                                 .font(.caption2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.secondary)
                         } else {
-                            Text("Brand: --- •")
+                            Text("Brand: ---")
                                 .font(.caption2)
-                                .foregroundColor(.black)
-                        }
-                        if let size = item.size, !size.isEmpty {
-                            Text("Size: \(size.uppercased())")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Size: --")
-                                .font(.caption2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.secondary)
                         }
                     }
-
                     HStack {
-                        if let color = item.color, !color.isEmpty {
-                            Text("\(color.capitalized) •")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Color: -- •")
-                                .font(.caption2)
-                                .foregroundColor(.black)
+                        Button {
+                            controller.deleteItem(item)
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.caption)
+                                .padding(6)
+                                .background(Color.red.opacity(0.1))
+                                .clipShape(Circle())
                         }
-                        if let material = item.material, !material.isEmpty {
-                            Text("\(material.capitalized)")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        } else {
-                            Text("Material: --")
-                                .font(.caption2)
-                                .foregroundColor(.black)
-                        }
-                    }
+                        .buttonStyle(.plain)
 
-                    HStack {
                         Spacer()
                         if let price = item.price, price > 0 {
                             Text("$\(String(format: "%.2f", price))")
@@ -361,120 +357,13 @@ struct ItemCard: View {
             }
         }
         .padding(8)
+        .background(Color(UIColor.secondarySystemBackground))   // <– card background
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 2)
         )
         .onTapGesture {
             controller.equipItem(itemId: item.id, category: item.category)
-        }
-    }
-}
-
-struct AddItemSheet: View {
-    @SwiftUI.Environment(\.dismiss) var dismiss
-    @ObservedObject var controller: WardrobeController
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Photo *")) {
-                    if let imageData = controller.formImageData,
-                       let uiImage = UIImage(data: imageData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxHeight: 200)
-                            .cornerRadius(8)
-                    }
-                    PhotosPicker(selection: $controller.formSelectedImage, matching: .images) {
-                        Label("Select Photo", systemImage: "photo")
-                    }
-                }
-
-                Section(header: Text("Basic Information")) {
-                    TextField("Name *", text: $controller.formName)
-                        .autocapitalization(.words)
-
-                    Picker("Category *", selection: $controller.formCategory) {
-                        ForEach(controller.formCategories, id: \.self) { cat in
-                            Text(cat.capitalized)
-                        }
-                    }
-
-                    TextField("Brand (optional)", text: $controller.formBrand)
-                        .autocapitalization(.words)
-                    TextField("Color *", text: $controller.formColor)
-                        .autocapitalization(.words)
-                }
-
-                Section(header: Text("Size")) {
-                    Picker("Size *", selection: $controller.formSize) {
-                        ForEach(controller.sizeOptions, id: \.self) { size in
-                            Text(size).tag(size)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                Section(header: Text("Price (Optional)")) {
-                    HStack {
-                        Text("$")
-                            .foregroundColor(.secondary)
-                        TextField("0.00", text: $controller.formPrice)
-                            .keyboardType(.decimalPad)
-                    }
-                }
-
-                Section(header: Text("Additional Information (Optional)")) {
-                    TextField("Product URL", text: $controller.formItemUrl)
-                        .autocapitalization(.none)
-                        .keyboardType(.URL)
-                    TextField("Material", text: $controller.formMaterial)
-                        .autocapitalization(.words)
-                }
-
-                if let errorMessage = controller.formErrorMessage {
-                    Section {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
-                }
-
-                Section {
-                    Text("* Required fields")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-            }
-            .navigationTitle("Add Item")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        controller.resetForm()
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        controller.submitAddItem()
-                    }
-                    .disabled(
-                        controller.formName.isEmpty ||
-                        controller.formColor.isEmpty ||
-                        controller.formIsLoading
-                    )
-                }
-            }
-            .onChange(of: controller.formSelectedImage) { _, newValue in
-                Task {
-                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                        controller.formImageData = data
-                    }
-                }
-            }
         }
     }
 }

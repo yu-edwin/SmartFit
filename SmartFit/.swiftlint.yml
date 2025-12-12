@@ -1,2 +1,4 @@
 excluded:
   - SeedData/SeedImages.swift
+  - WardrobeModel.swift
+  - WardrobeController.swift

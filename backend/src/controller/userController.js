@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import ClothingItem from "../models/clothingSchema.js";
 import { isValidEmail, isValidPassword } from "../utils/validation.js";
-import { generateOutfitImage } from "../services/geminiService.js";
+import { generateOutfitImageGemini3 } from "../services/geminiService.js";
 
 // GET request: Gets all info from user.
 export const getUserInfo = async (req, res) => {
@@ -285,19 +285,20 @@ export const generateOutfit = async (req, res) => {
             _id: { $in: itemIds },
         });
 
-        // Build prompt with item descriptions
-        let prompt = "";
-        wardrobeItems.forEach((item) => {
-            if (item.description) {
-                prompt += item.description + " ";
-            }
-        });
+        // Build clothing items array for Gemini 3
+        const clothingItems = wardrobeItems.map((item) => ({
+            image: item.image_data,
+            category: item.category,
+        }));
 
-        // Generate outfit image using Gemini
+        // Generate outfit image using Gemini 3
         console.log(
-            `Generate outfit requested for user ${userId}, outfit ${outfitNumber}`
+            `Generate outfit requested for user ${userId}, outfit ${outfitNumber} with ${clothingItems.length} items`
         );
-        const generatedImage = await generateOutfitImage(prompt, picture);
+        const generatedImage = await generateOutfitImageGemini3(
+            picture,
+            clothingItems
+        );
 
         // Return generated outfit image
         return res.status(200).json({
