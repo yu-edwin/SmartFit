@@ -112,10 +112,10 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 ### Links
 
 **Burn Chart**
-[Burn Chart Sprint 1] (https://github.com/users/yu-edwin/projects/1/insights/2)
-[Burn Chart Sprint 2] (https://github.com/users/yu-edwin/projects/1/insights/4?period=3M)
-[Burn Chart Sprint 3] (https://github.com/users/yu-edwin/projects/1/insights/3)
-[Burn Chart Sprint 4] (https://github.com/users/yu-edwin/projects/1/insights/5?period=1M)
+[Burn Chart Sprint 1] (https://github.com/users/yu-edwin/projects/1/insights/2)  
+[Burn Chart Sprint 2] (https://github.com/users/yu-edwin/projects/1/insights/4?period=3M)  
+[Burn Chart Sprint 3] (https://github.com/users/yu-edwin/projects/1/insights/3)  
+[Burn Chart Sprint 4] (https://github.com/users/yu-edwin/projects/1/insights/5?period=1M)  
 
 **CI/CD Pipeline**
 [View CI Workflow](https://github.com/yu-edwin/SmartFit/actions)
