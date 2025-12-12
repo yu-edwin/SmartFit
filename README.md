@@ -71,8 +71,7 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 
 ### Application view
 
-![Image of SmartFit Wardrobe](assets/PRD/SmartFitImage.png)
-[Video Demo]()
+![Image of SmartFit Wardrobe](assets/PRD/updatedSmartFit.png)
 
 ### Setup Instructions
 
