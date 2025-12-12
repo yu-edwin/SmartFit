@@ -118,11 +118,11 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 [Burn Chart Sprint 4] (https://github.com/users/yu-edwin/projects/1/insights/5?period=1M)  
 
 **CI/CD Pipeline**
-[View CI Workflow](https://github.com/yu-edwin/SmartFit/actions)
+- [View CI Workflow](https://github.com/yu-edwin/SmartFit/actions)
 
 **Project Board**
-[Project Board] (https://github.com/users/yu-edwin/projects/1/views/1)
+- [Project Board] (https://github.com/users/yu-edwin/projects/1/views/1)
 
 **Deployement Link**
-Note: Camera is not viewable in appetize
-[Appetize Link] (https://appetize.io/app/b_ljtpxdj664c3c667twqr6hj2ke)
+- Note: Camera is not viewable in appetize
+- [Appetize Link] (https://appetize.io/app/b_jbrv6dfc43l5ppkubk2gestxqi)
