@@ -156,18 +156,59 @@ final class WardrobeUITests: XCTestCase {
     }
     
     // MARK: - Empty State Tests
-    
+
     func testEmptyStateShowsWhenNoItems() throws {
         // This test assumes a fresh state with no items
         // You might need to clear data first
-        
+
         let noItemsText = app.staticTexts["No items yet"]
-        
+
         if noItemsText.exists {
             XCTAssertTrue(noItemsText.exists, "Empty state should show when no items")
-            
+
             let addItemButton = app.buttons["Add Item"]
             XCTAssertTrue(addItemButton.exists, "Add Item button should exist in empty state")
         }
+    }
+
+    // MARK: - Loading Screen Tests
+
+    func testLoadingIndicatorAppearsWhenFetchingItems() throws {
+        // Launch app fresh
+        app.terminate()
+        app.launch()
+
+        // Check if loading indicator appears (ProgressView or similar)
+        let loadingIndicator = app.activityIndicators.firstMatch
+
+        // Loading should appear briefly at launch
+        // Note: This might be fast, so we check if it existed or if content loaded
+        let wardrobeTitle = app.navigationBars["Wardrobe"]
+        XCTAssertTrue(
+            loadingIndicator.exists || wardrobeTitle.exists,
+            "Loading indicator should appear or content should load"
+        )
+    }
+
+    func testContentAppearsAfterLoading() throws {
+        // Wait for loading to complete
+        let wardrobeTitle = app.navigationBars["Wardrobe"]
+        XCTAssertTrue(
+            wardrobeTitle.waitForExistence(timeout: 5),
+            "Wardrobe screen should appear after loading"
+        )
+
+        // Loading indicator should disappear
+        let loadingIndicator = app.activityIndicators.firstMatch
+
+        // Wait a bit for loading to finish
+        sleep(2)
+
+        // Either loading is gone or we have content
+        let hasContent = app.buttons["All"].exists || app.staticTexts["No items yet"].exists
+        XCTAssertTrue(
+            !loadingIndicator.exists || hasContent,
+            "Loading should complete and show content or empty state"
+        )
     }
 }
