@@ -125,4 +125,4 @@ Our MVP focuses on delivering a **functional virtual wardrobe** backed by a real
 
 **Deployement Link**
 - Note: Camera is not viewable in appetize
-- [Appetize Link] (https://appetize.io/app/b_qlnal4xaoutg3pjlabgegum5n4)
+- [Appetize Link](https://appetize.io/app/b_qlnal4xaoutg3pjlabgegum5n4)
